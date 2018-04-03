@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8" />
+        <title>Form get textarea value - Editor.md examples</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="../css/editormd.css" />
+        <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
+    </head>
+	
+    <body>
+        <div id="layout">
+            <header>
+                <h1>表单取值</h1>   
+                <p>Form get textarea value.</p>     
+            </header>
+            <form id="content_form" action="/api/authenticate"  method="POST">
+			
+			    user_id<input type="text" name="user_id" value=1 />
+				user_name<input type="text" name="user_name" value="wuqianlin" /> 
+				user_image<input type="text" name="user_image" value="http://www.wuqianlin.cn/static/img/wuqianlin.jpg" /> 
+				name<input type="text" name="name" /> 
+				summary<input type="text" name="summary"/> 
+				tab<input type="text" name="tab" value="ai" /> 
+				
+						
+                <div id="test-editormd">
+				    
+                    <!-- Custom textarea name attribute <textarea style="display:none;" name="test-textarea-name"> -->
+                    <textarea style="display:none;"  name="email" form="content_form"></textarea>
+				</div>		
+				
+				<div style="width:90%;margin: 10px auto;">
+					<input type="submit" name="submit" value="提交表单 Submit" style="padding: 5px;" /> 
+				</div>  
+				
+			</form>		
+        </div>
+		
+        <script src="js/jquery.min.js"></script>
+        <script src="../editormd.js"></script>
+		
+        <script type="text/javascript">
+			var testEditor = editormd("test-editormd", {
+				width  : "90%",
+				height : 640,
+				path   : "../lib/",
+				saveHTMLToTextarea : true
+			});
+
+			testEditor.getMarkdown();       // 获取 Markdown 源码
+			testEditor.getHTML();           // 获取 Textarea 保存的 HTML 源码
+			testEditor.getPreviewedHTML();  // 获取预览窗口里的 HTML，在开启 watch 且没有开启 saveHTMLToTextarea 时使用
+
+        </script>
+    </body>
+</html>
