@@ -8,22 +8,23 @@
 {% endblock %}
 
 {% block content %}
-
     <div class="uk-width-medium-3-4">
         {% for blog in blogs %}
         <table border="0">
             <tr>
-                <td style="font-family:'宋体'; font-size:18px;">
+                <td class="blogs-list-content">
                     <a href="/blog/{{ blog.id }}">{{ blog.name }}</a>
                 </td>
-                <td style="font-family:'宋体'; font-size:10px;">......{{ blog.created_at | datetime}}</td>
+                <td class="blogs-list-date">......{{ blog.created_at | datetime}}</td>
             </tr>
         </table>
         {% endfor %}
     </div>
+{% endblock %}
 
-    <div class="uk-width-medium-1-4">
-        <div class="uk-panel uk-panel-header">
+{% block poster_board %}
+    <div class="uk-width-medium-1-4 content-medium-right">
+        <div class="uk-panel uk-panel-header " style="width: 100%">
             <h3 class="uk-panel-title">个人助理</h3>
             <ul class="uk-list uk-list-line">
                 <li><i class="uk-icon-thumbs-o-up"></i> <a target="_self" href="#">代办事项</a></li>

@@ -39,10 +39,10 @@
             <a href="/" class="uk-navbar-brand">QianlinWu</a>
             <ul class="uk-navbar-nav">
                 <li data-url="blogs"><a href="/"><i class="uk-icon-home"></i> 首页</a></li>
-                <li><a target="_self" href="read"><i class="uk-icon-book"></i> 读书&分享</a></li>
-                <li><a target="_self" href="python"><i class="uk-icon-book"></i> Python编程</a></li>
-                <li><a target="_self" href="opera"><i class="uk-icon-book"></i> 自动化运维</a></li>
-                <li><a target="_self" href="ai"><i class="uk-icon-book"></i> 人工智能</a></li>
+                <li><a target="_self" href="/read"><i class="uk-icon-book"></i> 读书&分享</a></li>
+                <li><a target="_self" href="/python"><i class="uk-icon-book"></i> Python编程</a></li>
+                <li><a target="_self" href="/opera"><i class="uk-icon-book"></i> 自动化运维</a></li>
+                <li><a target="_self" href="/ai"><i class="uk-icon-book"></i> 人工智能</a></li>
             </ul>
             <div class="uk-navbar-flip">
                 <ul class="uk-navbar-nav">
@@ -64,14 +64,21 @@
         </div>
     </nav>
 
-    <div class="uk-container uk-container-center">
-        <div class="uk-grid">
-            <!-- content -->
-            {% block content %}
-            {% endblock %}
-            <!-- // content -->
+
+    <div style="display: flex; justify-content: center">
+        <div class="content-father">
+            <div class="content-medium-left">
+                {% block content %}
+                {% endblock %}
+            </div>
+            <div class="content-medium-right-father">
+
+                    {% block poster_board %}
+                    {% endblock %}
+            </div>
         </div>
     </div>
+
 
     <div class="uk-margin-large-top" style="background-color:#eee; border-top:1px solid #ccc;">
         <div class="uk-container uk-container-center uk-text-center">
@@ -86,8 +93,8 @@
                 <p><a href="http://www.wuqianlin.cn/" target="_blank">www.wuqianlin.cn</a>. All rights reserved.</p>
                 <a target="_blank" href="http://www.w3.org/TR/html5/"><i class="uk-icon-html5" style="font-size:64px; color: #444;"></i></a>
             </div>
-
         </div>
     </div>
+
 </body>
 </html>

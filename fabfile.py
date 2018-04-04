@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = 'Michael Liao'
+__author__ = 'Qianlin Wu'
 
 '''
 Deployment toolkit.
@@ -12,9 +12,9 @@ import os, re
 from datetime import datetime
 from fabric.api import *
 
-env.user = 'michael'
+env.user = 'root'
 env.sudo_user = 'root'
-env.hosts = ['192.168.0.3']
+env.hosts = ['118.24.1.107']
 
 db_user = 'www-data'
 db_password = 'www-data'
@@ -23,13 +23,13 @@ _TAR_FILE = 'dist-awesome.tar.gz'
 
 _REMOTE_TMP_TAR = '/tmp/%s' % _TAR_FILE
 
-_REMOTE_BASE_DIR = '/srv/awesome'
+_REMOTE_BASE_DIR = '/var/www/duke'
 
 def _current_path():
     return os.path.abspath('.')
 
 def _now():
-    return datetime.now().strftime('%y-%m-%d_%H.%M.%S')
+    return datetime.now().strftime('%Y-%m-%d_%H.%M.%S')
 
 def backup():
     '''
@@ -48,8 +48,8 @@ def build():
     '''
     Build dist package.
     '''
-    includes = ['static', 'templates', 'transwarp', 'favicon.ico', '*.py']
-    excludes = ['test', '.*', '*.pyc', '*.pyo']
+    includes = ['static', 'templates', 'favicon.ico', '*.py']
+    excludes = ['.*', '*.pyc', '*.pyo']
     local('rm -f dist/%s' % _TAR_FILE)
     with lcd(os.path.join(_current_path(), 'www')):
         cmd = ['tar', '--dereference', '-czvf', '../dist/%s' % _TAR_FILE]
@@ -68,14 +68,16 @@ def deploy():
     with cd(_REMOTE_BASE_DIR):
         sudo('rm -f www')
         sudo('ln -s %s www' % newdir)
-        sudo('chown www-data:www-data www')
-        sudo('chown -R www-data:www-data %s' % newdir)
+        sudo('chown www:www www')
+        sudo('chown -R www:www %s' % newdir)
     with settings(warn_only=True):
-        sudo('supervisorctl stop awesome')
-        sudo('supervisorctl start awesome')
-        sudo('/etc/init.d/nginx reload')
+        sudo('supervisorctl stop duke')
+        sudo('supervisorctl start duke')
+        sudo('/usr/local/openresty/bin/openresty -s reload')
+
 
 RE_FILES = re.compile('\r?\n')
+
 
 def rollback():
     '''
@@ -124,6 +126,7 @@ def rollback():
             sudo('/etc/init.d/nginx reload')
         print ('ROLLBACKED OK.')
 
+
 def restore2local():
     '''
     Restore db to local
@@ -167,3 +170,4 @@ def restore2local():
     local(r'mysql -uroot -p%s awesome < backup/%s' % (p, restore_file[:-7]))
     with lcd(backup_dir):
         local('rm -f %s' % restore_file[:-7])
+
