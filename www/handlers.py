@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = 'Michael Liao'
+__author__ = 'duke.wu'
 
 ' url handlers '
 
 import re, time, json, logging, hashlib, base64, asyncio
-
-import markdown2
-
 from aiohttp import web
-
 from coroweb import get, post
-from apis import Page, APIValueError, APIResourceNotFoundError
-
+from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError
 from models import User, Comment, Blog, next_id
 from config import configs
 import markdown2
@@ -24,8 +19,9 @@ COOKIE_NAME = 'awesession'
 _COOKIE_KEY = configs.session.secret
 
 def check_admin(request):
+    print(request.__user__, request.__user__.admin)
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError( )
 
 def get_page_index(page_str):
     p = 1
@@ -88,47 +84,6 @@ def index():
         'blogs':blogs
     }
 
-'''
-@get('/')
-def index():
-    summary = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    blogs = [
-        Blog(id='1',name='Test Blog1',summary=summary,created_at=int(time.time()-120)),
-        Blog(id='2',name='Test Blog2',summary=summary,created_at=int(time.time()-3600)),
-        Blog(id='3',name='Test Blog3',summary=summary,created_at=int(time.time()-7200))
-    ]
-    return{
-        '__template__':'test_blogs.html',
-        'blogs':blogs
-    }
-'''
-
-'''
-@get('/tt')
-def index(*, page='1'):
-    page_index = get_page_index(page)
-    num = yield from Blog.findNumber('count(id)')
-    page = Page(num)
-    if num == 0:
-        blogs = []
-    else:
-        blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(page.offset, page.limit))
-    return {
-        '__template__': 'blogs.html',
-        'page': page,
-        'blogs': blogs
-    }
-'''
-
-'''
-@get('/editor')
-def get_editor():
-    return {
-        #'__template__': '.\\editor.md\\examples\\simple.html',
-        'static\editor.md\examples'
-    }
-'''
-
 @get('/read')
 def get_read():
     blogs = yield from Blog.findblogs_by_tab(tab="read")
@@ -163,7 +118,6 @@ def get_ai():
 
 @get('/blog/{id}')
 def get_blog(id):
-    print('******************')
     blog = yield from Blog.find(id)
     print(blog.content)
 
@@ -215,7 +169,6 @@ def authenticate(*, email, passwd):
         raise APIValueError('email', 'Email not exist.')
     user = users[0]
 
-    print(users)
     print(email, passwd)
     # check passwd:
     sha1 = hashlib.sha1()
@@ -276,15 +229,6 @@ def manage_blogs(*, page='1'):
     }
 '''
 
-@get('/blogshandle')
-def manage_blogs():
-    blogs = yield from Blog.findAll()
-    return {
-        '__template__': 'blogs_manage.html',
-        'blogs':blogs
-    }
-
-
 @get('/manage/blogs/create')
 def manage_create_blog():
     return {
@@ -301,9 +245,8 @@ def manage_edit_blog(*, id):
         'action': '/api/blogs/%s' % id
     }
 
-@post('/blog_create_save')
+@post('/api/blog_create_save')
 def authenticate2(*,user_id,user_name,user_image,name,summary,tab,content_md,private ):
-    print(user_id)
     blog = Blog(user_id=user_id,
                 user_name=user_name,
                 user_image=user_image,
@@ -313,44 +256,27 @@ def authenticate2(*,user_id,user_name,user_image,name,summary,tab,content_md,pri
                 content=content_md,
                 private=private)
     yield from blog.save()
-    print("email:" + content_md)
-    print(blog)
     return blog
 
-@post('/blogs_delete')
+@post('/api/blogs_delete')
 def blogs_delete(*, blog_id):
-    print("***********")
-    print(blog_id)
-    blog = Blog
     blog = yield from Blog.find(pk=blog_id)
     yield from blog.remove()
-'''
-@get('/blogs_edit')
-def blogs_edit():
-    blog = yield from Blog.find(pk="000002")
-    print(type(blog))
-    print(blog.user_name)
-    return{
-        '__template__': 'edit-for-update.html',
-        'id':blog.id,
-        'user_id':blog.user_id,
-        'user_name':blog.user_name,
-        'user_image':blog.user_image,
-        'name':blog.name,
-        'summary':blog.summary,
-        'tab':blog.tab,
-        'content':blog.content,
+
+
+@get('/api/blogshandle')
+def manage_blogs(request):
+    check_admin(request)
+    blogs = yield from Blog.findAll()
+    print(blogs)
+    return {
+        '__template__': 'blogs_manage.html',
+        'blogs':blogs
     }
-'''
 
-
-@post('/blogs_edit')
+@post('/api/blogs_edit')
 def blogs_edit(*, blog_id):
-    print('*********',blog_id)
     blog = yield from Blog.find(pk=blog_id)
-    print(type(blog))
-    print('----',blog)
-    print(blog.user_name)
     return{
         '__template__': 'edit-for-update.html',
         'id':blog.id,
@@ -363,11 +289,9 @@ def blogs_edit(*, blog_id):
         'content':blog.content,
     }
 
-@post('/edit_update')
+@post('/api/edit_update')
 def edit_update(*,id,user_id,user_name,user_image,name,summary,tab,content_md):
-    print(id,user_id,user_name,user_image,name,summary,tab,content_md),
     blog = yield from Blog.find(id)
-    print('-*-*-*-*-*-*-*-*-')
     blog.name = name.strip()
     blog.summary = summary.strip()
     blog.content = content_md.strip()
@@ -476,6 +400,7 @@ def api_get_blog(*, id):
     blog = yield from Blog.find(id)
     return blog
 
+
 @post('/api/blogs')
 def api_create_blog(request, *, name, summary, content):
     check_admin(request)
@@ -488,6 +413,7 @@ def api_create_blog(request, *, name, summary, content):
     blog = Blog(user_id=request.__user__.id, user_name=request.__user__.name, user_image=request.__user__.image, name=name.strip(), summary=summary.strip(), content=content.strip())
     yield from blog.save()
     return blog
+
 
 @post('/api/blogs/{id}')
 def api_update_blog(id, request, *, name, summary, content):
@@ -504,6 +430,7 @@ def api_update_blog(id, request, *, name, summary, content):
     blog.content = content.strip()
     yield from blog.update()
     return blog
+
 
 @post('/api/blogs/{id}/delete')
 def api_delete_blog(request, *, id):

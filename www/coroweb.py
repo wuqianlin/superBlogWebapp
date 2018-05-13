@@ -108,10 +108,12 @@ class RequestHandler(object):
                     return web.HTTPBadRequest('Unsupported Content-Type: %s' % request.content_type)
             if request.method == 'GET':
                 qs = request.query_string
+                print( qs)
                 if qs:
                     kw = dict()
                     for k, v in parse.parse_qs(qs, True).items():
                         kw[k] = v[0]
+        print(kw)
         if kw is None:
             kw = dict(**request.match_info)
         else:
@@ -158,6 +160,7 @@ def add_route(app, fn):
 
 def add_routes(app, module_name):
     n = module_name.rfind('.')
+    print(n)
     if n == (-1):
         mod = __import__(module_name, globals(), locals())
         print(mod)

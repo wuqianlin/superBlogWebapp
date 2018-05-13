@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = 'Michael Liao'
+__author__ = 'duke.wu'
 
 '''
 async web application.
@@ -91,13 +91,7 @@ def response_factory(app, handler):
     @asyncio.coroutine
     def response(request):
         logging.info('Response handler...')
-
         r = yield from handler(request)
-
-        logging.info( type(r) )
-        #logging.info( type(r), r )
-
-
         if isinstance(r, web.StreamResponse):
             return r
         if isinstance(r, bytes):
@@ -130,7 +124,6 @@ def response_factory(app, handler):
         # default:
         resp = web.Response(body=str(r).encode('utf-8'))
         resp.content_type = 'text/plain;charset=utf-8'
-        logging.info("hellllllll")
         return resp
     return response
 

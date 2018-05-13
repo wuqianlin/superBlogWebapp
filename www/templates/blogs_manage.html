@@ -16,13 +16,13 @@
                 <h6><a href="/blog/{{ blog.id }}">{{ blog.id }}</a></h6>
                 <p class="uk-article-meta">发表于{{ blog.created_at|datetime}}</p>
         </article>
-        <form action="/blogs_delete" method="POST">
+        <form action="/api/blogs_delete" method="POST">
             <input type="text" name="blog_id" value="{{ blog.id }}" />
             <input type="submit" name="blog_delete" value="Delete" />
             <hr class="uk-article-divider">
         </form>
 		
-        <form action="/blogs_edit" method="POST">
+        <form action="/api/blogs_edit" method="POST">
             <input type="text" name="blog_id" value="{{ blog.id }}" />
             <input type="submit" name="blog_edit" value="Edit" />
             <hr class="uk-article-divider">
