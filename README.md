@@ -12,37 +12,3 @@
 	
 MySQL的Python异步驱动程序aiomysql：
     $ pip3 install aiomysql
-    
-
-http://127.0.0.1:9000/blogs_edit
-http://127.0.0.1:9000/static/editor_md/examples/simple.html
-
-edit-for-update.html
-
-#### 新建blog
-    
-	GET:    http://127.0.0.1:9000/static/editor_md/examples/form-get-value2.html
-	POST:   http://127.0.0.1:9000/blog_create_save
-	
-#### blog删除
-    
-	GET:    http://127.0.0.1:9000/blogshandle
-        POST:   http://127.0.0.1:9000/blogs_delete
-
-#### 编辑blog
-
-	GET:    http://127.0.0.1:9000/blogs_edit
-	POST:   http://127.0.0.1:9000/edit_update
-
-#### blog后台管理
-
-	GET:    http://127.0.0.1:9000/blogshandle
-        POST:   http://127.0.0.1:9000/edit_update
-
-
-<class 'aiohttp.web_request.Request'>	
-
-#### 首页栏目链接
-
-    CET:    http://127.0.0.1:9000/read
-	

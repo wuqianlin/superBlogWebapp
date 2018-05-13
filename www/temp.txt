@@ -1,8 +1,0 @@
-alter table blogs add latestupdated_at double;
-alter table blogs add private tinyint(1);
-
-
-
-http://127.0.0.1:9000/blogshandle   blogs_manage.html
-
-http://127.0.0.1:9000/static/editor_md/examples/form-get-value2.html
