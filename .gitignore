@@ -1,0 +1,25 @@
+/backup
+/conf
+/dist
+/log
+/www/baseKn
+#/www/test
+
+
+# Others
+/fabfile.py
+
+
+#IDE PyCharm files
+/.idea
+/www/__pycache__
+/.python-version
+
+
+# Python:
+*.pyc
+*.pco
+*.pyd
+*.so
+*.egg
+*.egg-info

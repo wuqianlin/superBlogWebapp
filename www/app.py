@@ -59,7 +59,9 @@ def auth_factory(app, handler):
     def auth(request):
         logging.info('check user: %s %s' % (request.method, request.path))
         request.__user__ = None
+
         cookie_str = request.cookies.get(COOKIE_NAME)
+        logging.info('cookie_srt : %s' % cookie_str)
         if cookie_str:
             user = yield from cookie2user(cookie_str)
             if user:
@@ -89,7 +91,13 @@ def response_factory(app, handler):
     @asyncio.coroutine
     def response(request):
         logging.info('Response handler...')
+
         r = yield from handler(request)
+
+        logging.info( type(r) )
+        #logging.info( type(r), r )
+
+
         if isinstance(r, web.StreamResponse):
             return r
         if isinstance(r, bytes):
@@ -122,6 +130,7 @@ def response_factory(app, handler):
         # default:
         resp = web.Response(body=str(r).encode('utf-8'))
         resp.content_type = 'text/plain;charset=utf-8'
+        logging.info("hellllllll")
         return resp
     return response
 

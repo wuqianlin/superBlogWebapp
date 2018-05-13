@@ -90,6 +90,7 @@ def execute(sql, args):
     with (yield from __pool) as conn:
         try:
             cur = yield from conn.cursor()
+            print( sql.replace('?', '%s'), args )
             yield from cur.execute(sql.replace('?', '%s'), args)
             affected = cur.rowcount
             yield from cur.close()
@@ -122,6 +123,7 @@ class Field(object):
 class StringField(Field):
     def __init__(self, name=None, primary_key=False, default=None, ddl='varchar(100)'):
         super().__init__(name, ddl, primary_key, default)
+
 # 布尔类型不可以作为主键
 class BooleanField(Field):
     def __init__(self, name=None, default=False):
@@ -189,6 +191,7 @@ class ModelMetaclass(type):
         attrs['__fields__'] = fields # 除主键外的属性名
         # 构造默认的SELECT, INSERT, UPDATE和DELETE语句:
         attrs['__select__'] = 'select `%s`, %s from `%s`' % (primaryKey, ', '.join(escaped_fields), tableName)
+        print(attrs['__select__'])
         attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' % (tableName, ', '.join(escaped_fields), primaryKey, create_args_string(len(escaped_fields) + 1))
         print( attrs['__insert__'] )
         attrs['__update__'] = 'update `%s` set %s where `%s`=?' % (tableName, ', '.join(map(lambda f: '`%s`=?' % (mappings.get(f).name or f), fields)), primaryKey)
@@ -300,6 +303,21 @@ class Model(dict, metaclass=ModelMetaclass):
 
     @classmethod
     @asyncio.coroutine
+    def findAllbyEmail(self, cls, **kw):
+        rs = []
+        if len(kw) == 0:
+            rs = yield from select(cls.__select__, None)
+        else:
+            args = []
+            values = []
+            for k, v in kw.items():
+                args.append('%s=?' % k)
+                values.append(v)
+            rs = yield from select('%s where %s ' % (cls.__select__, ' and '.join(args)), values)
+        return rs
+
+    @classmethod
+    @asyncio.coroutine
     def findAllOrderBy(cls, **kw):
         rs = []
         if len(kw) == 0:
@@ -383,11 +401,19 @@ if __name__ == "__main__":
         print( dir(User))
         bb = yield from Blog.find_all()
         cc = yield from Blog.findAllOrderBy(orderby='created_at')
-        print('------',cc)
+        print('------', cc)
+
+
+        email =  'Simpleran@sina.com'
+        uu = yield from User.findAll( email = email )
+        print( type(uu[0]) )
+        print( uu[0]['id'] )
+
+        print('------',uu)
+
 
         __pool.close()
         yield from __pool.wait_closed()
-
 
     loop.run_until_complete(test_example())
 
