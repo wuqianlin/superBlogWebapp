@@ -24,13 +24,13 @@ a:hover, a:active {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    width: 89%;
+    width: 70%;
 
 }
 .content-medium-left {
     display: flex;
     align-items: center;
-    width: 78%;
+    width: 100%;
 }
 .content-medium-right-father {
     display: flex;
