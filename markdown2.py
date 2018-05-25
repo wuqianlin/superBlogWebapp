@@ -1857,7 +1857,7 @@ class Markdown(object):
     def _code_span_sub(self, match):
         c = match.group(2).strip(" \t")
         c = self._encode_code(c)
-        return "<pre><code>%s</code></pre>" % c
+        return "<code>%s</code>" % c
 
     def _do_code_spans(self, text):
         #   *   Backtick quotes are used for <code></code> spans.
@@ -1871,11 +1871,11 @@ class Markdown(object):
         #
         #         <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
         #
-        #       There's no arbitrary limit to the number of backt you
-        #       can use as delimiters. If you need three consecutive back quote
+        #       There's no arbitrary limit to the number of backticks you
+        #       can use as delimters. If you need three consecutive backticks
         #       in your code, use four for delimiters, etc.
         #
-        #   *   You can use spaces to get literal back quote at the edges:
+        #   *   You can use spaces to get literal backticks at the edges:
         #
         #         ... type `` `bar` `` ...
         #

@@ -12,6 +12,7 @@ from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionErr
 from models import User, Comment, Blog, next_id
 from config import configs
 import markdown2
+import markdown
 import codecs
 
 
@@ -115,22 +116,6 @@ def get_ai():
         '__template__': 'operation.html',
         'blogs':blogs
     }
-
-@get('/blog/{id}')
-def get_blog(id):
-    blog = yield from Blog.find(id)
-
-    #comments = yield from Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
-    comments = yield from Comment.findAll()
-    for c in comments:
-        c['html_content'] = text2html(c['content'])
-    blog.html_content = markdown2.markdown(blog.content)
-    return {
-        '__template__': 'blog.html',
-        'blog': blog,
-        'comments': comments
-    }
-
 
 @get('/register')
 def register():
@@ -244,18 +229,7 @@ def manage_edit_blog(*, id):
         'action': '/api/blogs/%s' % id
     }
 
-@post('/api/blog_create_save')
-def authenticate2(*,user_id,user_name,user_image,name,summary,tab,content_md,private ):
-    blog = Blog(user_id=user_id,
-                user_name=user_name,
-                user_image=user_image,
-                name=name,
-                summary=summary,
-                tab=tab,
-                content=content_md,
-                private=private)
-    yield from blog.save()
-    return blog
+
 
 @post('/api/blogs_delete')
 def blogs_delete(*, blog_id):
@@ -265,7 +239,7 @@ def blogs_delete(*, blog_id):
 
 @get('/api/blogshandle')
 def manage_blogs(request):
-    check_admin(request)
+    #check_admin(request)
     blogs = yield from Blog.findAll()
     print(blogs)
     return {
@@ -397,9 +371,48 @@ def api_blogs(*, page='1'):
 @get('/api/blogs/{id}')
 def api_get_blog(*, id):
     blog = yield from Blog.find(id)
+
+    #comments = yield from Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
+    comments = yield from Comment.findAll()
+    for c in comments:
+        c['html_content'] = text2html(c['content'])
+
+    input_file = codecs.open('test.md', mode="r", encoding="utf-8")
+    text = input_file.read()
+    html = markdown.markdown(text)
+
+    #blog.html_content = markdown.markdown( blog.content )
+
+    blog.html_content = markdown2.markdown(text, safe_mode="escape")
+    logging.info("博客内容: %s" % blog.html_content)
+    return {
+        '__template__': 'blog.html',
+        'blog': blog,
+        'comments': comments
+    }
+
+'''
+@get('/api/blogs/{id}')
+def api_get_blog(*, id):
+    blog = yield from Blog.find(id)
+    return blog
+'''
+
+
+@post('/api/blogs')
+def api_create_blog(request, *, user_id,user_name,user_image,name,summary,tab,content_md,private ):
+    blog = Blog(user_id=user_id,
+                user_name=user_name,
+                user_image=user_image,
+                name=name,
+                summary=summary,
+                tab=tab,
+                content=content_md,
+                private=private)
+    yield from blog.save()
     return blog
 
-
+'''
 @post('/api/blogs')
 def api_create_blog(request, *, name, summary, content):
     check_admin(request)
@@ -412,6 +425,7 @@ def api_create_blog(request, *, name, summary, content):
     blog = Blog(user_id=request.__user__.id, user_name=request.__user__.name, user_image=request.__user__.image, name=name.strip(), summary=summary.strip(), content=content.strip())
     yield from blog.save()
     return blog
+'''
 
 
 @post('/api/blogs/{id}')
