@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8" />
+        <title>Form get textarea value - Editor.md examples</title>
+        <link rel="stylesheet" href="/static/editor/examples/css/style.css" />
+        <link rel="stylesheet" href="/static/editor/examples/css/mdedit.css" />
+        <link rel="stylesheet" href="/static/editor/css/editormd.css" />
+        <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+        <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
+    </head>
+	
+    <body>
+        <div id="layout">
+            <form id="content_form" onsubmit="return false" action="##" name="focusform" method="POST">
+                <div id="head-handle" >
+                    <div class="div-name">
+                        <input style="width: 100%;height: 30px;" type="text" onFocus="clearfield()" value="无标题Markdown文档" name="name" />
+                    </div>
+                    <div class="div-label">
+                        <select name="label" style="display:flex; width:100%; height: 28px; text-align: center; text-align-last: center;">
+                            <option value = "private" selected="other">其它标签</option>
+                            <option value = "read" >read</option>
+                            <option value = "python" >python</option>
+                            <option value = "opera" >opera</option>
+                            <option value = "ai" >ai</option>
+                        </select>
+                    </div>
+                    <div class="div-limit">
+                        <select name="limit" style="display:flex; width:100%;height: 28px; ">
+                            <option value = "1" selected="private">私有</option>
+                            <option value = "0" >公开</option>
+                        </select>
+                    </div>
+                    <div class="div-submit">
+                        <!-- input type="submit" name="submit" value="保存" style="width: 100%;height: 40px;" / -->
+                        <button type="submit" onclick="content_submit()" name="submit" value="保存" title="sfa" style="width: 100%;height: 30px;">保存
+                        </button>
+                    </div>
+                </div>
+                <div id="editormd">
+                    <!-- Custom textarea name attribute <textarea style="display    :none;" name="test-textarea-name"> -->
+                    <textarea style="display:none;"  name="content" form="content_form"></textarea>
+                </div>
+			</form>		
+        </div>
+		
+        <script src="/editor/examples/js/jquery.min.js"></script>
+        <script src="/editor/editormd.js"></script>
+        <script type="text/javascript">
+			var testEditor = editormd("editormd", {
+				width  : "90%",
+				height : 640,
+                path : "../../static/editor/lib/",
+				saveHTMLToTextarea : true
+			});
+			testEditor.getMarkdown();       // 获取 Markdown 源码
+			testEditor.getHTML();           // 获取 Textarea 保存的 HTML 源码
+			testEditor.getPreviewedHTML();  // 获取预览窗口里的 HTML，在开启 watch 且没有开启 saveHTMLToTextarea 时使用
+
+            function clearfield( ){
+                if (document.focusform.name.value == "无标题Markdown文档")
+                    document.focusform.name.value = "";
+            }
+        </script>
+
+        <script type="text/javascript">
+
+            function blog_init() {
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/api/blogs" ,
+                    data: $('#content_form').serialize(),
+                    success: function (result) {
+                        blog_id = result;
+                        console.log(blog_id);
+                        if (result.resultCode == 200) {
+                            alert("SUCCESS");
+                        }
+                        ;
+                    },
+                    error : function() {
+                        alert("异常！");
+                    }
+                });
+            }
+            blog_init();
+
+            $(function( ){
+                setInterval("content_submit()",5000);
+            });
+
+            function content_submit() {
+                $.ajax({
+                    type: "POST",  //方法类型
+                    dataType: "json",  //预期服务器返回的数据类型
+                    url: "/api/blogs" ,
+                    data: $.param({"blogid":blog_id})+'&'+$('#content_form').serialize(),
+                    success: function (result) {
+                        console.log(result);
+                        if (result.resultCode == 200) {
+                            alert("SUCCESS");
+                        }
+                        ;
+                    },
+                    error : function() {
+                        alert("异常！");
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

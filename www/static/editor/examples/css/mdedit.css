@@ -1,0 +1,44 @@
+#layout {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+#head-handle {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin:0 auto;
+    width:90%;
+    margin-bottom: 6px;
+    margin-top: 16px;
+}
+.div-name{
+    display: flex;
+    flex-direction: column;
+    order: -1;
+    flex-grow: 9;
+}
+.div-label{
+    display: flex;
+    margin-left: 2px;
+    order: 0;
+    flex-grow: 1;
+    text-align:center;
+}
+.div-limit{
+    display: flex;
+    flex-direction: column;
+    margin-left: 2px;
+    order: 1;
+    flex-grow: 1;
+}
+.div-submit{
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 2px;
+    order: 2;
+    flex-grow: 1;
+}

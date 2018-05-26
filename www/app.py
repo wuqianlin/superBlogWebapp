@@ -8,7 +8,6 @@ async web application.
 '''
 
 import logging; logging.basicConfig(level=logging.INFO)
-
 import asyncio, os, json, time
 from datetime import datetime
 
@@ -16,11 +15,9 @@ from aiohttp import web
 from jinja2 import Environment, FileSystemLoader
 from jinja2.ext import autoescape
 
-from config import configs
-
 import orm
+from config import configs
 from coroweb import add_routes, add_static
-
 from handlers import cookie2user, COOKIE_NAME
 
 def init_jinja2(app, **kw):

@@ -1,14 +1,10 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = 'Michael Liao'
+__author__ = 'duke.wu'
 
 import asyncio, os, inspect, logging, functools
-
 from urllib import parse
-
 from aiohttp import web
-
 from apis import APIError
 
 def get(path):
@@ -113,7 +109,7 @@ class RequestHandler(object):
                     kw = dict()
                     for k, v in parse.parse_qs(qs, True).items():
                         kw[k] = v[0]
-        print(kw)
+        print("函数参数检查:%s" % kw)
         if kw is None:
             kw = dict(**request.match_info)
         else:

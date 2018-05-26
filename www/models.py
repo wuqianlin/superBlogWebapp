@@ -33,12 +33,12 @@ class Blog(Model):
     user_name = StringField(ddl='varchar(50)')
     user_image = StringField(ddl='varchar(500)')
     name = StringField(ddl='varchar(50)')
-    tab = StringField(ddl='varchar(50)')
     summary = StringField(ddl='varchar(200)')
     content = TextField()
+    label = StringField(ddl='varchar(50)')
+    limit = BooleanField()
     created_at = FloatField(default=time.time)
     latestupdated_at = FloatField(default=time.time)
-    private = BooleanField()
 
 class Comment(Model):
     __table__ = 'comments'

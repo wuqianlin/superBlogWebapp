@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 __author__ = 'duke.wu'
@@ -14,13 +13,15 @@ from config import configs
 import markdown2
 import markdown
 import codecs
+import mistune
 
 
 COOKIE_NAME = 'awesession'
+COOKIE_BLOG = 'blogid'
 _COOKIE_KEY = configs.session.secret
 
+
 def check_admin(request):
-    print(request.__user__, request.__user__.admin)
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError( )
 
@@ -48,7 +49,6 @@ def text2html(text):
     lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
     return ''.join(lines)
 
-
 @asyncio.coroutine
 def cookie2user(cookie_str):
     '''
@@ -75,7 +75,6 @@ def cookie2user(cookie_str):
     except Exception as e:
         logging.exception(e)
         return None
-
 
 @get('/')
 def index():
@@ -147,14 +146,13 @@ def authenticate(*, email, passwd):
         raise APIValueError('email', 'Invalid email.')
     if not passwd:
         raise APIValueError('passwd', 'Invalid password.')
-    # users = yield from User.findAll('email=?', [email])
-    users = yield from User.findAll( email = email )
+    #users = yield from User.findAll('email=?', [email])
+    users = yield from User.findAll(email = email)
     if len(users) == 0:
         raise APIValueError('email', 'Email not exist.')
     user = users[0]
 
-    print(email, passwd)
-    # check passwd:
+    # check password:
     sha1 = hashlib.sha1()
     sha1.update(user['id'].encode('utf-8'))
     sha1.update(b':')
@@ -162,8 +160,9 @@ def authenticate(*, email, passwd):
     print( 'user[\'passwd\']:', user['passwd']  )
     print( 'sha1.hexdigest():', sha1.hexdigest() )
 
-    if user['passwd'] != sha1.hexdigest():  #####
+    if user['passwd'] != sha1.hexdigest():
         raise APIValueError('passwd', 'Invalid password.')
+
     # authenticate ok, set cookie:
     r = web.Response()
     r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age=86400, httponly=True)
@@ -213,6 +212,12 @@ def manage_blogs(*, page='1'):
     }
 '''
 
+@get('/manage/editor')
+def create_editor_page():
+    return {
+        '__template__': 'editor.html',
+    }
+
 @get('/manage/blogs/create')
 def manage_create_blog():
     return {
@@ -228,7 +233,6 @@ def manage_edit_blog(*, id):
         'id': id,
         'action': '/api/blogs/%s' % id
     }
-
 
 
 @post('/api/blogs_delete')
@@ -377,55 +381,55 @@ def api_get_blog(*, id):
     for c in comments:
         c['html_content'] = text2html(c['content'])
 
-    input_file = codecs.open('test.md', mode="r", encoding="utf-8")
-    text = input_file.read()
-    html = markdown.markdown(text)
-
+    #input_file = codecs.open('test.md', mode="r", encoding="utf-8")
+    #text = input_file.read()
+    #html = markdown.markdown(text)
     #blog.html_content = markdown.markdown( blog.content )
+    #blog.html_content = markdown.markdown(text, safe_mode="escape")
 
-    blog.html_content = markdown2.markdown(text, safe_mode="escape")
-    logging.info("博客内容: %s" % blog.html_content)
+    markdown = mistune.Markdown()
+    blog.html_content = markdown(blog.content)
+
     return {
         '__template__': 'blog.html',
         'blog': blog,
         'comments': comments
     }
 
-'''
-@get('/api/blogs/{id}')
-def api_get_blog(*, id):
-    blog = yield from Blog.find(id)
-    return blog
-'''
-
 
 @post('/api/blogs')
-def api_create_blog(request, *, user_id,user_name,user_image,name,summary,tab,content_md,private ):
-    blog = Blog(user_id=user_id,
-                user_name=user_name,
-                user_image=user_image,
-                name=name,
-                summary=summary,
-                tab=tab,
-                content=content_md,
-                private=private)
-    yield from blog.save()
-    return blog
-
-'''
-@post('/api/blogs')
-def api_create_blog(request, *, name, summary, content):
+def api_create_blog(request, *, name, content, label, limit, blogid=''):
     check_admin(request)
+
     if not name or not name.strip():
         raise APIValueError('name', 'name cannot be empty.')
-    if not summary or not summary.strip():
-        raise APIValueError('summary', 'summary cannot be empty.')
-    if not content or not content.strip():
-        raise APIValueError('content', 'content cannot be empty.')
-    blog = Blog(user_id=request.__user__.id, user_name=request.__user__.name, user_image=request.__user__.image, name=name.strip(), summary=summary.strip(), content=content.strip())
-    yield from blog.save()
-    return blog
-'''
+    #if not content or not content.strip():
+    #    raise APIValueError('content', 'content cannot be empty.')
+    if blogid == '':
+        blog = Blog(user_id = request.__user__.id,
+                    user_name = request.__user__.name,
+                    user_image = request.__user__.image,
+                    name = name,
+                    tab = label,
+                    content = content,
+                    limit = limit)
+        print('I am A!!!')
+        yield from blog.save()
+        return json.dumps(blog.id)
+    else:
+        blog = yield from Blog.find(pk=blogid)
+        blog.id = blogid,
+        blog.user_id = request.__user__.id,
+        blog.user_name = request.__user__.name,
+        blog.user_image = request.__user__.image,
+        blog.name = name,
+        blog.tab = label,
+        blog.content = content,
+        blog.limit = limit
+        print('I am B!!!')
+        yield from blog.update( )
+        return json.dumps(blog.id)
+
 
 
 @post('/api/blogs/{id}')
