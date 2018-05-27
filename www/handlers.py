@@ -8,7 +8,7 @@ import re, time, json, logging, hashlib, base64, asyncio
 from aiohttp import web
 from coroweb import get, post
 from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError
-from models import User, Comment, Blog, next_id
+from models import User, Comment, Blog, Label, next_id
 from config import configs
 import markdown2
 import markdown
@@ -35,6 +35,7 @@ def get_page_index(page_str):
         p = 1
     return p
 
+
 def user2cookie(user, max_age):
     '''
     Generate cookie str by user.
@@ -45,9 +46,11 @@ def user2cookie(user, max_age):
     L = [user['id'], expires, hashlib.sha1(s.encode('utf-8')).hexdigest()]
     return '-'.join(L)
 
+
 def text2html(text):
     lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
     return ''.join(lines)
+
 
 @asyncio.coroutine
 def cookie2user(cookie_str):
@@ -76,45 +79,24 @@ def cookie2user(cookie_str):
         logging.exception(e)
         return None
 
+
 @get('/')
 def index():
     blogs = yield from Blog.findAllOrderBy(created_at='created_at')
     return {
-        '__template__': 'operation.html',
+        '__template__': 'itemlist.html',
         'blogs':blogs
     }
 
-@get('/read')
-def get_read():
-    blogs = yield from Blog.findblogs_by_tab(tab="read")
+
+@get('/project/{name}')
+def project_list(name):
+    blogs = yield from Blog.findAll(label=name)
     return {
-        '__template__': 'operation.html',
+        '__template__': 'itemlist.html',
         'blogs':blogs
     }
 
-@get('/python')
-def get_python():
-    blogs = yield from Blog.findblogs_by_tab(tab="python")
-    return {
-        '__template__': 'operation.html',
-        'blogs':blogs
-    }
-
-@get('/opera')
-def get_opera():
-    blogs = yield from Blog.findblogs_by_tab(tab="opera")
-    return {
-        '__template__': 'operation.html',
-        'blogs':blogs
-    }
-
-@get('/ai')
-def get_ai():
-    blogs = yield from Blog.findblogs_by_tab(tab="ai")
-    return {
-        '__template__': 'operation.html',
-        'blogs':blogs
-    }
 
 @get('/register')
 def register():
@@ -134,10 +116,6 @@ def getsignin():
         '__template__': 'getsignin.html'
     }
 
-@post('/postinfo')
-def getpostinfo(*, email, passwd):
-    print("***hello the world")
-    print(email)
 
 @post('/api/authenticate')
 def authenticate(*, email, passwd):
@@ -178,11 +156,13 @@ def postform():
         '__template__': 'postform.html'
     }
 
+
 @get('/textarea')
 def textarea():
     return {
         '__template__': 'textarea.html'
     }
+
 
 @get('/signout')
 def signout(request):
@@ -191,6 +171,7 @@ def signout(request):
     r.set_cookie(COOKIE_NAME, '-deleted-', max_age=0, httponly=True)
     logging.info('user signed out.')
     return r
+
 
 @get('/manage/')
 def manage():
@@ -203,6 +184,16 @@ def manage_comments(*, page='1'):
         'page_index': get_page_index(page)
     }
 
+@get('/manage/blogs')
+def manage_blogs(request):
+    check_admin(request)
+    blogs = yield from Blog.findAll()
+    print(blogs)
+    return {
+        '__template__': 'blogs_manage.html',
+        'blogs':blogs
+    }
+
 '''
 @get('/manage/blogs')
 def manage_blogs(*, page='1'):
@@ -212,11 +203,13 @@ def manage_blogs(*, page='1'):
     }
 '''
 
+
 @get('/manage/editor')
 def create_editor_page():
     return {
         '__template__': 'editor.html',
     }
+
 
 @get('/manage/blogs/create')
 def manage_create_blog():
@@ -226,6 +219,7 @@ def manage_create_blog():
         'action': '/api/blogs'
     }
 
+
 @get('/manage/blogs/edit')
 def manage_edit_blog(*, id):
     return {
@@ -234,47 +228,6 @@ def manage_edit_blog(*, id):
         'action': '/api/blogs/%s' % id
     }
 
-
-@post('/api/blogs_delete')
-def blogs_delete(*, blog_id):
-    blog = yield from Blog.find(pk=blog_id)
-    yield from blog.remove()
-
-
-@get('/api/blogshandle')
-def manage_blogs(request):
-    #check_admin(request)
-    blogs = yield from Blog.findAll()
-    print(blogs)
-    return {
-        '__template__': 'blogs_manage.html',
-        'blogs':blogs
-    }
-
-@post('/api/blogs_edit')
-def blogs_edit(*, blog_id):
-    blog = yield from Blog.find(pk=blog_id)
-    return{
-        '__template__': 'edit-for-update.html',
-        'id':blog.id,
-        'user_id':blog.user_id,
-        'user_name':blog.user_name,
-        'user_image':blog.user_image,
-        'name':blog.name,
-        'summary':blog.summary,
-        'tab':blog.tab,
-        'content':blog.content,
-    }
-
-@post('/api/edit_update')
-def edit_update(*,id,user_id,user_name,user_image,name,summary,tab,content_md):
-    blog = yield from Blog.find(id)
-    blog.name = name.strip()
-    blog.summary = summary.strip()
-    blog.content = content_md.strip()
-    blog.tab = tab.strip()
-    blog.latestupdated_at = time.time()
-    yield from blog.update()
 
 @get('/manage/users')
 def manage_users(*, page='1'):
@@ -362,8 +315,10 @@ def api_register_user(*, email, name, passwd):
     r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
     return r
 
+
 @get('/api/blogs')
-def api_blogs(*, page='1'):
+def api_blogs(request,*, page='1'):
+    check_admin(request)
     page_index = get_page_index(page)
     num = yield from Blog.findNumber('count(id)')
     p = Page(num, page_index)
@@ -372,10 +327,10 @@ def api_blogs(*, page='1'):
     blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, blogs=blogs)
 
+
 @get('/api/blogs/{id}')
 def api_get_blog(*, id):
     blog = yield from Blog.find(id)
-
     #comments = yield from Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
     comments = yield from Comment.findAll()
     for c in comments:
@@ -400,7 +355,6 @@ def api_get_blog(*, id):
 @post('/api/blogs')
 def api_create_blog(request, *, name, content, label, limit, blogid=''):
     check_admin(request)
-
     if not name or not name.strip():
         raise APIValueError('name', 'name cannot be empty.')
     #if not content or not content.strip():
@@ -410,10 +364,9 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
                     user_name = request.__user__.name,
                     user_image = request.__user__.image,
                     name = name,
-                    tab = label,
+                    label = label,
                     content = content,
                     limit = limit)
-        print('I am A!!!')
         yield from blog.save()
         return json.dumps(blog.id)
     else:
@@ -423,13 +376,21 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
         blog.user_name = request.__user__.name,
         blog.user_image = request.__user__.image,
         blog.name = name,
-        blog.tab = label,
+        blog.label = label,
         blog.content = content,
         blog.limit = limit
-        print('I am B!!!')
         yield from blog.update( )
         return json.dumps(blog.id)
 
+
+@get('/api/blogs/{id}/edit')
+def blogs_edit(id,request):
+    check_admin(request)
+    blog = yield from Blog.find(pk=id)
+    return{
+        '__template__': 'modify.html',
+        'blog': blog
+    }
 
 
 @post('/api/blogs/{id}')
@@ -450,8 +411,19 @@ def api_update_blog(id, request, *, name, summary, content):
 
 
 @post('/api/blogs/{id}/delete')
-def api_delete_blog(request, *, id):
+def api_delete_blog(id, request):
     check_admin(request)
-    blog = yield from Blog.find(id)
+    blog = yield from Blog.find(pk=id)
     yield from blog.remove()
-    return dict(id=id)
+    logging.info("博客删除成功！！！")
+    data = dict()
+    data.setdefault("msc","删除成功")
+    data.setdefault("code","2000")
+    data.setdefault("blog_id", id)
+    return json.dumps(data)
+
+
+@get('/api/lables')
+def api_get_lables( ):
+    blog = yield from Label.findAll( )
+    return json.dumps( blog )

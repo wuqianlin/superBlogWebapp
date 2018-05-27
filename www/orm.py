@@ -280,8 +280,8 @@ class Model(dict, metaclass=ModelMetaclass):
 
     @classmethod
     @asyncio.coroutine
-    def findblogs_by_tab(cls,tab):
-        sql = 'select * from %s where tab="%s" ORDER BY `created_at` DESC;' % (cls.__table__,tab)
+    def findblogs_by_tab(cls,label):
+        sql = 'select * from %s where label="%s" ORDER BY `created_at` DESC;' % (cls.__table__,label)
         print(sql)
         rs = yield from select(sql,None)
         return rs

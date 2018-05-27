@@ -5,7 +5,7 @@
 Models for user, blog, comment.
 '''
 
-__author__ = 'Michael Liao'
+__author__ = 'duke.wu'
 
 import time, uuid
 
@@ -50,6 +50,15 @@ class Comment(Model):
     user_image = StringField(ddl='varchar(500)')
     content = TextField()
     created_at = FloatField(default=time.time)
+
+class Label(Model):
+    __table__ = 'labels'
+
+    id = StringField(primary_key=True, default=next_id, ddl='varchar(8)')
+    label = StringField(ddl='varchar(50)')
+    explain = StringField(ddl='varchar(500)')
+    created_at = FloatField(default=time.time)
+
 
 '''
 class Permission(object):

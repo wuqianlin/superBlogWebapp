@@ -11,25 +11,46 @@
 
     <div class="uk-width-medium-3-4">
         {% for blog in blogs %}
+
         <article class="uk-article">
                 <h2><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
                 <h6><a href="/blog/{{ blog.id }}">{{ blog.id }}</a></h6>
                 <p class="uk-article-meta">发表于{{ blog.created_at|datetime}}</p>
         </article>
-        <form action="/api/blogs_delete" method="POST">
-            <input type="text" name="blog_id" value="{{ blog.id }}" />
-            <input type="submit" name="blog_delete" value="Delete" />
-            <hr class="uk-article-divider">
-        </form>
-		
-        <form action="/api/blogs_edit" method="POST">
-            <input type="text" name="blog_id" value="{{ blog.id }}" />
-            <input type="submit" name="blog_edit" value="Edit" />
-            <hr class="uk-article-divider">
-        </form>
 
+        <button type="submit" onclick="delete_blogs('{{blog.id}}')" name="submit" value="12345" title="sfa" style="width: 60px;height: 30px;">删除
+        </button>
+        <button type="submit" onclick="edit_blogs('{{blog.id}}')" name="submit" value="编辑" title="sfa" style="width: 60px;height: 30px;">编辑
+        </button>
+        <hr class="uk-article-divider">
 
         {% endfor %}
     </div>
-{% endblock %}
 
+    <script type="text/javascript">
+        function delete_blogs(id){
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/api/blogs/" + id + "/delete",
+                success: function (result) {
+                    console.log( result )
+                    if (result.code == 2000) {
+                        alert("删除成功");
+                        window.location.reload();
+                    }
+                },
+                error : function() {
+                    alert("异常！");
+                    window.location.reload();
+                }
+            });
+        }
+
+        function edit_blogs(id){
+            var url = "/api/blogs/" + id + "/edit";
+            window.location.href=url;
+        }
+
+    </script>
+{% endblock %}
