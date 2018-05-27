@@ -10,9 +10,6 @@ from coroweb import get, post
 from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError
 from models import User, Comment, Blog, Label, next_id
 from config import configs
-import markdown2
-import markdown
-import codecs
 import mistune
 
 
