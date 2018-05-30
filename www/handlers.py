@@ -328,8 +328,8 @@ def api_blogs(request,*, page='1'):
 @get('/api/blogs/{id}')
 def api_get_blog(*, id):
     blog = yield from Blog.find(id)
-    #comments = yield from Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
-    comments = yield from Comment.findAll()
+    comments = yield from Comment.findAll(blog_id=id)
+    #comments = yield from Comment.findAll()
     for c in comments:
         c['html_content'] = text2html(c['content'])
 
@@ -343,7 +343,7 @@ def api_get_blog(*, id):
     blog.html_content = markdown(blog.content)
 
     return {
-        '__template__': 'blog.html',
+        '__template__': 'blogs.html',
         'blog': blog,
         'comments': comments
     }
