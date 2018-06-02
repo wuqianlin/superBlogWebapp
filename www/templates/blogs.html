@@ -40,8 +40,6 @@ $(function () {
 
         <hr class="uk-article-divider">
 
-
-
         <h3>最新评论</h3>
 
         <ul class="uk-comment-list">
@@ -64,47 +62,25 @@ $(function () {
         </ul>
 
         {% if __user__ %}
-        <h3>发表评论</h3>
-
-        <article class="uk-comment">
-            <header class="uk-comment-header">
-                <img class="uk-comment-avatar uk-border-circle" width="35" height="35" src="{{ __user__.image }}">
-            </header>
-            <div class="uk-comment-body">
-                <form id="form-comment" class="uk-form">
+        <h3>发布评论</h3>
+        <div class="uk-comment super-comment">
+            <div class="uk-comment-header super-comment-header">
+                <img class="uk-comment-avatar uk-border-circle"  src="{{ __user__.image }}">
+            </div>
+            <div class="uk-comment-body super-comment-content">
+                <form id="form-comment" class="uk-form super-comment-form">
                     <div class="uk-alert uk-alert-danger uk-hidden"></div>
                     <div class="uk-form-row">
-                        <textarea rows="6" placeholder="说点什么吧" style="width:100%;resize:none;"></textarea>
+                        <textarea rows="6" placeholder="文明社会，理性评论" style="width:100%;resize:none;"></textarea>
                     </div>
-                    <div class="uk-form-row">
-                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-comment"></i> 发表评论</button>
+                    <div class="uk-form-row super-comment-buttom">
+                        <button type="submit" class="uk-button uk-button-primary">发布评论</button>
                     </div>
                 </form>
             </div>
-        </article>
-
-            <div >----</div>
-
-        <article class="uk-comment">
-            <header class="uk-comment-header">
-                <img class="uk-comment-avatar uk-border-circle" width="35" height="35" src="{{ __user__.image }}">
-            </header>
-            <div class="uk-comment-body">
-                <form id="form-comment" class="uk-form">
-                    <div class="uk-alert uk-alert-danger uk-hidden"></div>
-                    <div class="uk-form-row">
-                        <textarea rows="6" placeholder="说点什么吧" style="width:100%;resize:none;"></textarea>
-                    </div>
-                    <div class="uk-form-row">
-                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-comment"></i> 发表评论</button>
-                    </div>
-                </form>
-            </div>
-        </article>
-
+        </div>
         <hr class="uk-article-divider">
     {% endif %}
-
     </div>
 {% endblock %}
 
@@ -121,6 +97,5 @@ $(function () {
         </div>
     </div>
     -->
-
 {% endblock %}
 

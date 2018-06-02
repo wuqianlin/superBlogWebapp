@@ -53,3 +53,31 @@ a:hover, a:active {
     font-size:10px;
 }
 
+.super-comment {
+    display: flex;
+    align-items: flex-start;
+}
+.super-comment-header {
+    display: flex;
+    width: 35px;
+    height: 35px;
+}
+.super-comment-content {
+    display: flex;
+    flex-basis: 100%;
+
+}
+.super-comment-form {
+    display: flex;
+    flex-flow: column wrap;
+    width: 100%;
+}
+.super-comment-form div {
+    display: flex;
+}
+.super-comment-buttom {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+}
+

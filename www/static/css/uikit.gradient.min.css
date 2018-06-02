@@ -954,12 +954,19 @@ iframe {
 	padding-top:25px;
 	border-top:1px solid #ddd
 }
+/*.uk-comment {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+	flex-shrink: 1;
+}
+*/
 .uk-comment-header {
 	margin-bottom:15px;
 	padding:10px;
-	border:1px solid #ddd;
 	border-radius:4px;
-	background:#fafafa
+	width:35px;
 }
 .uk-comment-header:before,.uk-comment-header:after {
 	content:" ";
@@ -995,7 +1002,7 @@ iframe {
 	list-style:none
 }
 .uk-comment-list .uk-comment+ul {
-	margin:25px 0 0;
+	margin:40px 0 0;
 	list-style:none
 }
 .uk-comment-list>li:nth-child(n+2),.uk-comment-list .uk-comment+ul>li:nth-child(n+2) {
@@ -2015,7 +2022,7 @@ select.uk-form-width-mini {
 	text-align:center;
 	border:none;
 	line-height:28px;
-	min-height:30px;
+	min-height:33px;
 	font-size:1rem;
 	padding:0 12px;
 	background:#f7f7f7;
