@@ -81,7 +81,7 @@ def cookie2user(cookie_str):
 def index():
     blogs = yield from Blog.findAllOrderBy(created_at='created_at')
     return {
-        '__template__': 'itemlist.html',
+        '__template__': 'blogslist.html',
         'blogs':blogs
     }
 
@@ -90,7 +90,7 @@ def index():
 def project_list(name):
     blogs = yield from Blog.findAll(label=name)
     return {
-        '__template__': 'itemlist.html',
+        '__template__': 'blogslist.html',
         'blogs':blogs
     }
 

@@ -68,8 +68,26 @@ $(function () {
 
         <article class="uk-comment">
             <header class="uk-comment-header">
-                <img class="uk-comment-avatar uk-border-circle" width="50" height="50" src="{{ __user__.image }}">
-                <h4 class="uk-comment-title">{{ __user__.name }}</h4>
+                <img class="uk-comment-avatar uk-border-circle" width="35" height="35" src="{{ __user__.image }}">
+            </header>
+            <div class="uk-comment-body">
+                <form id="form-comment" class="uk-form">
+                    <div class="uk-alert uk-alert-danger uk-hidden"></div>
+                    <div class="uk-form-row">
+                        <textarea rows="6" placeholder="说点什么吧" style="width:100%;resize:none;"></textarea>
+                    </div>
+                    <div class="uk-form-row">
+                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-comment"></i> 发表评论</button>
+                    </div>
+                </form>
+            </div>
+        </article>
+
+            <div >----</div>
+
+        <article class="uk-comment">
+            <header class="uk-comment-header">
+                <img class="uk-comment-avatar uk-border-circle" width="35" height="35" src="{{ __user__.image }}">
             </header>
             <div class="uk-comment-body">
                 <form id="form-comment" class="uk-form">
