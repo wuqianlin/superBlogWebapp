@@ -41,31 +41,100 @@ $(function () {
         <hr class="uk-article-divider">
 
         <h3>最新评论</h3>
-
-        <ul class="uk-comment-list">
+        <div class="comments-container">
             {% for comment in comments %}
-            <li>
-                <article class="uk-comment">
+
+            <div class="comments-list">
+
+                <div class="comments-pull-left">
                     <header class="uk-comment-header">
                         <img class="uk-comment-avatar uk-border-circle" width="50" height="50" src="{{ comment.user_image }}">
-                        <h4 class="uk-comment-title">{{ comment.user_name }} {% if comment.user_id==blog.user_id %}(作者){% endif %}</h4>
-                        <p class="uk-comment-meta">{{ comment.created_at|datetime }}</p>
                     </header>
-                    <div class="uk-comment-body">
-                        {{ comment.html_content|safe }}
+                </div>
+
+                <div class="comments-content">
+                    <div class="comment-trigger">
+                        <div>
+                            <strong><a target="_blank" href="/u/gatinul">{{ comment.user_name }} {% if comment.user_id==blog.user_id %}(作者){% endif %}</a></strong>
+                        </div>
+                        <div>
+                            <p class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</p>
+                        </div>
                     </div>
-                </article>
-            </li>
+
+                    <div>
+                        <p>{{ comment.html_content|safe }}</p>
+                    </div>
+
+                    <div >
+                        <div>
+                            <span class="uk-comment-meta" style="font-size:13px;"> &nbsp;回复</span>
+                        </div>
+                    </div>
+
+                    <div class="reply-content-block ">
+                        <div class="reply-content-item ">
+                            <div>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                            </div>
+                            <div class="reply-content">
+                                <div>
+                                    <p style="margin-bottom: 6px;">@qianlin 你在说什么？</p>
+                                </div>
+                                <div>
+                                    <span>
+                                        <span> -- </span>
+                                        <span>Duke_Wu</span>
+                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</span>
+                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;引用</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reply-content-item  ">
+                            <div>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                            </div>
+                            <div class="reply-content">
+                                <div>
+                                    <p style="margin-bottom: 6px;">@qianlin 你在说什么？</p>
+                                </div>
+                                <div>
+                                    <span>
+                                        <span> -- </span>
+                                        <span>Duke_Wu</span>
+                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</span>
+                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;引用</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form  class="comment-reply-form" action="/api/comment/1050000015141667/reply">
+                            <div style="flex-grow:1; justify-content: center">
+                                <textarea  name="text" rows="1" placeholder="文明社会，理性评论"></textarea>
+                            </div>
+                            <div>
+                                <button type="button" class="uk-button uk-button-primary">添加回复</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <hr class="uk-article-divider">
             {% else %}
-            <p>还没有人评论...</p>
+            <div>还没有人评论...</div>
             {% endfor %}
-        </ul>
+        </div>
+
 
         {% if __user__ %}
-        <h3>发布评论</h3>
+        <h3 style="margin-top: 15px;">发布评论</h3>
         <div class="uk-comment super-comment">
             <div class="uk-comment-header super-comment-header">
-                <img class="uk-comment-avatar uk-border-circle"  src="{{ __user__.image }}">
+                <img class="uk-comment-avatar uk-border-circle"  style="flex: 0;" src="{{ __user__.image }}">
             </div>
             <div class="uk-comment-body super-comment-content">
                 <form id="form-comment" class="uk-form super-comment-form">

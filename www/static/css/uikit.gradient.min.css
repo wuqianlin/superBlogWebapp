@@ -206,10 +206,10 @@ img {
 	max-width:none
 }
 p,hr,ul,ol,dl,blockquote,pre,address,fieldset,figure {
-	margin:0 0 15px
+	margin:0 0 10px
 }
 *+p,*+hr,*+ul,*+ol,*+dl,*+blockquote,*+pre,*+address,*+fieldset,*+figure {
-	margin-top:15px
+	margin-top:10px
 }
 h1,h2,h3,h4,h5,h6 {
 	margin:0 0 15px;
@@ -944,11 +944,11 @@ iframe {
 	font-weight:400
 }
 .uk-article-divider {
-	margin-bottom:25px;
+	margin-bottom:14px;
 	border-color:#ddd
 }
 *+.uk-article-divider {
-	margin-top:25px
+	margin-top:14px
 }
 .uk-article+.uk-article {
 	padding-top:25px;
@@ -963,8 +963,8 @@ iframe {
 }
 */
 .uk-comment-header {
-	margin-bottom:15px;
-	padding:10px;
+	margin-bottom: 10px;
+	padding:0  10px 10px 10px;
 	border-radius:4px;
 	width:35px;
 }
@@ -986,13 +986,13 @@ iframe {
 }
 .uk-comment-meta {
 	margin:2px 0 0;
-	font-size:11px;
+	font-size:10px;
 	line-height:16px;
 	color:#999
 }
 .uk-comment-body {
-	padding-left:10px;
-	padding-right:10px
+	padding-left:8px;
+	padding-right:8px
 }
 .uk-comment-body>:last-child {
 	margin-bottom:0
