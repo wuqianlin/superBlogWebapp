@@ -97,6 +97,11 @@ a:hover, a:active {
     flex-flow: column wrap;
     flex-grow: 1;
 }
+.comments-content>div>span{
+    cursor: pointer;
+    font-size:13px;
+
+}
 .comments-pull-left{
 
 }
@@ -112,6 +117,9 @@ a:hover, a:active {
     margin-bottom: 10px;
     background-color: rgb(249,249,249);
 }
+.reply-content-block>form{
+    display: flex;
+}
 .reply-content-item {
     margin-top: 10px;
     padding-bottom: 8px;
@@ -126,8 +134,7 @@ a:hover, a:active {
     justify-content: space-between;
 
 }
-.comment-reply-form div textarea {
-    display: flex;
+.comment-reply-form>div>textarea {
     min-height: 32px;
     max-height: 132px;
     width: 100%;
@@ -136,7 +143,7 @@ a:hover, a:active {
     margin: 8px 10px 10px 10px;
     border-radius: 3px;
 }
-.comment-reply-form div button {
+.comment-reply-form>div>button {
     margin: 8px 10px 10px 2px;
 }
 

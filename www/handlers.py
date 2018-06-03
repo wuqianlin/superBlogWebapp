@@ -257,9 +257,38 @@ def api_create_comment(id, request, *, content):
     blog = yield from Blog.find(id)
     if blog is None:
         raise APIResourceNotFoundError('Blog')
-    comment = Comment(blog_id=blog.id, user_id=user.id, user_name=user.name, user_image=user.image, content=content.strip())
+    comment = Comment(blog_id=blog.id,
+                      user_id=user.id,
+                      user_name=user.name,
+                      user_image=user.image,
+                      content=content.strip())
     yield from comment.save()
     return comment
+
+@get('/api/blogs/{id}/comments')
+def api_get_comment(id, request):
+    user = request.__user__
+    if user is None:
+        raise APIPermissionError('Please signin first.')
+    comments = yield from Comment.findAll(blog_id=id)
+    if comments is None:
+        raise APIResourceNotFoundError('Comment')
+
+    parent_comments = list()
+    child_comments = list()
+    for item in comments:
+        if item['parent_id'] == '':
+            parent_comments.append(item)
+        else:
+            child_comments.append(item)
+    for x in parent_comments:
+        child_comments_list = list()
+        for y in child_comments:
+            if x.get('id') == y.get('parent_id'):
+                child_comments_list.append(y)
+        x.setdefault('child_comments', child_comments_list)
+    return json.dumps(parent_comments)
+
 
 @post('/api/comments/{id}/delete')
 def api_delete_comments(id, request):
@@ -325,13 +354,38 @@ def api_blogs(request,*, page='1'):
     return dict(page=p, blogs=blogs)
 
 
+
+def get_comments(blog_id):
+
+    comments = yield from Comment.findAll(blog_id=blog_id)
+    if comments is None:
+        raise APIResourceNotFoundError('Comment')
+
+    parent_comments = list()
+    child_comments = list()
+    for item in comments:
+        if item['parent_id'] == '':
+            parent_comments.append(item)
+        else:
+            child_comments.append(item)
+    for x in parent_comments:
+        child_comments_list = list()
+        for y in child_comments:
+            if x.get('id') == y.get('parent_id'):
+                child_comments_list.append(y)
+        x.setdefault('child_comments', child_comments_list)
+    return parent_comments
+
+
 @get('/api/blogs/{id}')
 def api_get_blog(*, id):
     blog = yield from Blog.find(id)
-    comments = yield from Comment.findAll(blog_id=id)
+    #comments = yield from Comment.findAll(blog_id=id)
     #comments = yield from Comment.findAll()
-    for c in comments:
-        c['html_content'] = text2html(c['content'])
+    #for c in comments:
+    #    c['html_content'] = text2html(c['content'])
+
+    comments = get_comments(id)
 
     #input_file = codecs.open('test.md', mode="r", encoding="utf-8")
     #text = input_file.read()

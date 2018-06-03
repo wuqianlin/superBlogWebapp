@@ -25,6 +25,36 @@ $(function () {
         });
     });
 });
+
+
+var reply_status;
+function comment_display(temp){
+     target = $(temp).parent().parent().find(comment_reply_item);
+     try{
+         reply_status.css('display','none');
+     }catch(error){
+         reply_status = target;
+     }
+     reply_status = target;
+     target.css('display','');
+     target.find('textarea').text('')
+}
+
+function quote_replay(temp) {
+    target = $(temp).parent().parent().parent().parent().parent().find(comment_reply_item);
+    quote_name = $(temp).prev('span').prev('span').text();
+    quote_content = '@' + quote_name + ' ';
+    try{
+         target.find('textarea').text('');
+         reply_status.css('display','none');
+    }catch(error){
+         reply_status = target;
+    }
+    reply_status = target;
+    target.css('display','');
+    target.find('textarea').text(quote_content)
+}
+
 </script>
 
 {% endblock %}
@@ -45,7 +75,6 @@ $(function () {
             {% for comment in comments %}
 
             <div class="comments-list">
-
                 <div class="comments-pull-left">
                     <header class="uk-comment-header">
                         <img class="uk-comment-avatar uk-border-circle" width="50" height="50" src="{{ comment.user_image }}">
@@ -66,12 +95,9 @@ $(function () {
                         <p>{{ comment.html_content|safe }}</p>
                     </div>
 
-                    <div >
-                        <div>
-                            <span class="uk-comment-meta" style="font-size:13px;"> &nbsp;回复</span>
-                        </div>
+                    <div>
+                        <span onclick='comment_display(this)' class="uk-comment-meta"> &nbsp;回复</span>
                     </div>
-
                     <div class="reply-content-block ">
                         <div class="reply-content-item ">
                             <div>
@@ -83,16 +109,15 @@ $(function () {
                                 </div>
                                 <div>
                                     <span>
-                                        <span> -- </span>
-                                        <span>Duke_Wu</span>
+                                        <span>--</span>
+                                        <span>Jackson</span>
                                         <span class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</span>
-                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;引用</span>
+                                        <span class="uk-comment-meta" onclick='quote_replay(this)' style="cursor: pointer;"> &nbsp;.&nbsp;引用</span>
                                     </span>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="reply-content-item  ">
+                        <div class="reply-content-item">
                             <div>
                                 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                             </div>
@@ -103,15 +128,14 @@ $(function () {
                                 <div>
                                     <span>
                                         <span> -- </span>
-                                        <span>Duke_Wu</span>
+                                        <span>Lucy</span>
                                         <span class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</span>
-                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;引用</span>
+                                        <span class="uk-comment-meta" onclick='quote_replay(this)' style="cursor: pointer;"> &nbsp;.&nbsp;引用</span>
                                     </span>
                                 </div>
                             </div>
                         </div>
-
-                        <form  class="comment-reply-form" action="/api/comment/1050000015141667/reply">
+                        <form id="comment_reply_item" style="display: none;" class="comment-reply-form" action="/api/comment/1050000015141667/reply">
                             <div style="flex-grow:1; justify-content: center">
                                 <textarea  name="text" rows="1" placeholder="文明社会，理性评论"></textarea>
                             </div>
@@ -119,7 +143,6 @@ $(function () {
                                 <button type="button" class="uk-button uk-button-primary">添加回复</button>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
@@ -149,7 +172,7 @@ $(function () {
             </div>
         </div>
         <hr class="uk-article-divider">
-    {% endif %}
+        {% endif %}
     </div>
 {% endblock %}
 
