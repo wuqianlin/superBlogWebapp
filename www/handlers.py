@@ -374,6 +374,7 @@ def get_comments(blog_id):
             if x.get('id') == y.get('parent_id'):
                 child_comments_list.append(y)
         x.setdefault('child_comments', child_comments_list)
+
     return parent_comments
 
 
@@ -385,7 +386,27 @@ def api_get_blog(*, id):
     #for c in comments:
     #    c['html_content'] = text2html(c['content'])
 
-    comments = get_comments(id)
+
+    #comments = get_comments(id)
+    comments = yield from Comment.findAll(blog_id=id)
+    if comments is None:
+        raise APIResourceNotFoundError('Comment')
+
+    parent_comments = list()
+    child_comments = list()
+    for item in comments:
+        for c in comments:
+            c['html_content'] = text2html(c['content'])
+        if item['parent_id'] == '':
+            parent_comments.append(item)
+        else:
+            child_comments.append(item)
+    for x in parent_comments:
+        child_comments_list = list()
+        for y in child_comments:
+            if x.get('id') == y.get('parent_id'):
+                child_comments_list.append(y)
+        x.setdefault('child_comments', child_comments_list)
 
     #input_file = codecs.open('test.md', mode="r", encoding="utf-8")
     #text = input_file.read()
@@ -399,7 +420,7 @@ def api_get_blog(*, id):
     return {
         '__template__': 'blogs.html',
         'blog': blog,
-        'comments': comments
+        'comments': parent_comments
     }
 
 

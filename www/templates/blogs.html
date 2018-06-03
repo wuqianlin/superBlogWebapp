@@ -42,7 +42,7 @@ function comment_display(temp){
 
 function quote_replay(temp) {
     target = $(temp).parent().parent().parent().parent().parent().find(comment_reply_item);
-    quote_name = $(temp).prev('span').prev('span').text();
+    quote_name = $(temp).prev('span').prev('a').children('strong').text();
     quote_content = '@' + quote_name + ' ';
     try{
          target.find('textarea').text('');
@@ -87,7 +87,7 @@ function quote_replay(temp) {
                             <strong><a target="_blank" href="/u/gatinul">{{ comment.user_name }} {% if comment.user_id==blog.user_id %}(作者){% endif %}</a></strong>
                         </div>
                         <div>
-                            <p class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</p>
+                            <p class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at | datetime }}</p>
                         </div>
                     </div>
 
@@ -98,43 +98,38 @@ function quote_replay(temp) {
                     <div>
                         <span onclick='comment_display(this)' class="uk-comment-meta"> &nbsp;回复</span>
                     </div>
+
                     <div class="reply-content-block ">
+
+                        {% for reply in  comment.child_comments %}
                         <div class="reply-content-item ">
                             <div>
                                 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                             </div>
                             <div class="reply-content">
                                 <div>
-                                    <p style="margin-bottom: 6px;">@qianlin 你在说什么？</p>
+                                    <p style="margin-bottom: 6px;">
+                                        <a target="_blank" href="/u/duke_wu" rel="nofollow noreferrer">
+                                            {% if reply.at_who != '' %}@{% endif %}{{reply.at_who}}
+                                        </a>
+                                        <span>{{ reply.content|safe }}</span>
+                                    </p>
                                 </div>
                                 <div>
                                     <span>
-                                        <span>--</span>
-                                        <span>Jackson</span>
-                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</span>
+                                        <span> — </span>
+                                        <a target="_blank" href="/u/duke_wu">
+                                            <strong>{{ reply.user_name }}</strong>
+                                        </a>
+                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;{{ reply.created_at|datetime }}</span>
                                         <span class="uk-comment-meta" onclick='quote_replay(this)' style="cursor: pointer;"> &nbsp;.&nbsp;引用</span>
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <div class="reply-content-item">
-                            <div>
-                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                            </div>
-                            <div class="reply-content">
-                                <div>
-                                    <p style="margin-bottom: 6px;">@qianlin 你在说什么？</p>
-                                </div>
-                                <div>
-                                    <span>
-                                        <span> -- </span>
-                                        <span>Lucy</span>
-                                        <span class="uk-comment-meta"> &nbsp;.&nbsp;{{ comment.created_at|datetime }}</span>
-                                        <span class="uk-comment-meta" onclick='quote_replay(this)' style="cursor: pointer;"> &nbsp;.&nbsp;引用</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        {% endfor %}
+
+
                         <form id="comment_reply_item" style="display: none;" class="comment-reply-form" action="/api/comment/1050000015141667/reply">
                             <div style="flex-grow:1; justify-content: center">
                                 <textarea  name="text" rows="1" placeholder="文明社会，理性评论"></textarea>
@@ -144,6 +139,8 @@ function quote_replay(temp) {
                             </div>
                         </form>
                     </div>
+
+
                 </div>
             </div>
             <hr class="uk-article-divider">

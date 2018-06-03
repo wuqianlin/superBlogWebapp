@@ -49,6 +49,7 @@ class Comment(Model):
     user_name = StringField(ddl='varchar(50)')
     user_image = StringField(ddl='varchar(500)')
     parent_id = StringField(ddl='varchar(50)')
+    at_who = StringField(ddl='varchar(50)')
     content = TextField()
     created_at = FloatField(default=time.time)
 
