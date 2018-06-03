@@ -43,15 +43,16 @@ $(function () {
     });
 });
 
-function comments_reply() {
+function comments_reply(temp) {
     console.log(comment_url);
+    console.log($('#comment_reply_item').serializeObject());
     $.ajax({
         url: comment_url,
         type: "POST",
-        data:JSON.stringify($('#comment_reply_item').serializeObject()),
+        data:JSON.stringify($(temp).parent().parent().serializeObject()),
         contentType:"application/json",
-        success:function(){
-                alert("成功");
+        success:function(result){
+            console.log(result);
         }
     })
 }
@@ -166,7 +167,7 @@ function quote_replay(temp) {
                                 <textarea  name="content" rows="1" placeholder="文明社会，理性评论"></textarea>
                             </div>
                             <div>
-                                <button type="submit" onclick="comments_reply()" class="uk-button uk-button-primary">添加回复</button>
+                                <button type="submit" onclick="comments_reply(this)" class="uk-button uk-button-primary">添加回复</button>
                             </div>
                         </form>
                     </div>
