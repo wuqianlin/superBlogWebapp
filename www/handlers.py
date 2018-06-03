@@ -248,7 +248,7 @@ def editor_md( submit ):
     print( submit )
 
 @post('/api/blogs/{id}/comments')
-def api_create_comment(id, request, *, content):
+def api_create_comment(id, request, *, content, parent_id=''):
     user = request.__user__
     if user is None:
         raise APIPermissionError('Please signin first.')
@@ -257,9 +257,21 @@ def api_create_comment(id, request, *, content):
     blog = yield from Blog.find(id)
     if blog is None:
         raise APIResourceNotFoundError('Blog')
+
+    at_who = ''
+    if content.startswith('@'):
+        content_tmp = content.strip('@').split(' ', 1)
+        at_who = content_tmp[0]
+        if content_tmp[1]:
+            content = content_tmp[1]
+        else:
+            content = ''
+
     comment = Comment(blog_id=blog.id,
                       user_id=user.id,
                       user_name=user.name,
+                      parent_id=parent_id,
+                      at_who=at_who,
                       user_image=user.image,
                       content=content.strip())
     yield from comment.save()

@@ -6,6 +6,23 @@
 
 <script>
 
+$.fn.serializeObject = function()
+{
+   var o = {};
+   var a = this.serializeArray();
+   $.each(a, function() {
+       if (o[this.name]) {
+           if (!o[this.name].push) {
+               o[this.name] = [o[this.name]];
+           }
+           o[this.name].push(this.value || '');
+       } else {
+           o[this.name] = this.value || '';
+       }
+   });
+   return o;
+};
+
 var comment_url = '/api/blogs/{{ blog.id }}/comments';
 
 $(function () {
@@ -25,6 +42,20 @@ $(function () {
         });
     });
 });
+
+function comments_reply() {
+    console.log(comment_url);
+    $.ajax({
+        url: comment_url,
+        type: "POST",
+        data:JSON.stringify($('#comment_reply_item').serializeObject()),
+        contentType:"application/json",
+        success:function(){
+                alert("成功");
+        }
+    })
+}
+
 
 
 var reply_status;
@@ -129,17 +160,16 @@ function quote_replay(temp) {
                         </div>
                         {% endfor %}
 
-
-                        <form id="comment_reply_item" style="display: none;" class="comment-reply-form" action="/api/comment/1050000015141667/reply">
+                        <form id="comment_reply_item" style="display: none;" class="comment-reply-form" >
+                            <input style="display: none" type="text"  value="{{ comment.id }}" name="parent_id" />
                             <div style="flex-grow:1; justify-content: center">
-                                <textarea  name="text" rows="1" placeholder="文明社会，理性评论"></textarea>
+                                <textarea  name="content" rows="1" placeholder="文明社会，理性评论"></textarea>
                             </div>
                             <div>
-                                <button type="button" class="uk-button uk-button-primary">添加回复</button>
+                                <button type="submit" onclick="comments_reply()" class="uk-button uk-button-primary">添加回复</button>
                             </div>
                         </form>
                     </div>
-
 
                 </div>
             </div>
