@@ -138,7 +138,7 @@ table {
 	border-spacing:0
 }
 html {
-	font-size:14px
+	font-size:16px
 }
 body {
 	background:#fff;
@@ -158,7 +158,7 @@ body {
 	hyphens:auto
 }
 }a,.uk-link {
-	color:#07d;
+	color:#005a94;;
 	text-decoration:none;
 	cursor:pointer
 }
@@ -635,7 +635,7 @@ iframe {
 	width:25%
 }
 .uk-width-medium-3-4 {
-	width:75%
+	width:660px;
 }
 .uk-width-medium-1-5,.uk-width-medium-2-10 {
 	width:20%

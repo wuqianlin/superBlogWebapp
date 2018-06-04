@@ -8,31 +8,104 @@
 {% endblock %}
 
 {% block content %}
-    <div class="uk-width-medium-3-4">
-        {% for blog in blogs %}
-        <table border="0">
-            <tr>
-                <td class="blogs-list-content">
-                    <a href="/api/blogs/{{ blog.id }}">{{ blog.name }}</a>
-                </td>
-                <td class="blogs-list-date">......{{ blog.created_at | datetime}}</td>
-            </tr>
-        </table>
-        {% endfor %}
+    <div class="blogs-list-content">
+        <ul>
+            {% for blog in blogs %}
+            <li style="list-style-type:none; height: 85px; width: 712px; padding: 18px 24px 18px 24px; border-color:#f4f4f4; border-style:none none solid none; border-width:1px;">
+                <div style="">
+                    <div>
+                        <span>
+                            <h2 style="font-size: 18px; font-weight: bold; line-height: 24px; height: 24px; margin-bottom: 4px; display: inline-block;">
+                                <a href="/api/blogs/{{ blog.id }}" > {{ blog.name }} </a>
+                            </h2>
+                        </span>
+                    </div>
+                    <div style="text-overflow: ellipsis; white-space: nowrap;overflow: hidden;margin-bottom: 4px; font-size: 13px; color: #8a8a8a; line-height: 24px;">
+                        2018年6月3日，由中国IT技术社区CSDN和专注以太坊生态建设的领先企业灵钛科技主办，以太坊爱好者社区、柏链道捷、火星财经、金色财经、Unitimes、区块链大本营协办的「2018以太坊技术及应用大会·中国」在北京·悠唐皇冠假日酒店隆重举行。
+                        本次大会围绕以太坊生态、以太坊核心技术、以太坊优质应用展开，邀请了众多国内外顶级开发者、以太坊团队核心成员，以及顶级项目负责人齐聚于此，共同助力中国以...
+                    </div>
+
+                    <dl class="list_userbar">
+
+                        <dt>
+                            <a href="#" target="_blank" class="user_img">
+                                <img class="super-comment-header"  style="flex: 0;" src="/static/img/firefly.jpeg">
+                            </a>
+                        </dt>
+
+                        <div class="interval"></div>
+                        <dd class="name">
+                            <a href="#" target="_blank">{{ blog.user_name }}</a>
+                        </dd>
+
+                        <div class="interval"></div>
+                        <dd class="time">{{blog.created_at | datetime}}</dd>
+
+                        <div class="interval"></div>
+
+                        <dd class="tag">
+                            <a href="#" target="_blank">{{ blog.label }}</a>
+                        </dd>
+
+
+                        <!--阅读 begin-->
+                        <dd class="blogs_read_num">
+                            <a href="#" target="_blank">
+                                <span class="num">2233</span>
+                                <span class="text">阅读</span>
+                            </a>
+                        </dd>
+                        <!--阅读 end-->
+
+                        <!--新增评论数+阅读 begin-->
+                        <div class="interval"></div>
+                        <dd>
+                            <a href="#" target="_blank">
+                                <span class="num">17</span>
+                                <span class="text">评论</span>
+                            </a>
+                        </dd>
+				        <!--新增评论数+阅读 end-->
+
+                    </dl>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 {% endblock %}
 
+
 {% block poster_board %}
-    <!--
-    <div class="uk-width-medium-1-4 content-medium-right">
-        <div class="uk-panel uk-panel-header " style="width: 100%">
-            <h3 class="uk-panel-title">个人助理</h3>
-            <ul class="uk-list uk-list-line">
-                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_self" href="#">代办事项</a></li>
-                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_self" href="#">书签管理</a></li>
-                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_self" href="#">个人理财</a></li>
+    <div class="uk-panel uk-panel-header" style="width: 100%; background-color: #ffffff;">
+        <div style="margin: 3px 8px 3px 8px;">
+            <h3 class="uk-panel-title" style="margin-top: 10px;margin-bottom: 8px; padding-bottom: 2px;">关于</h3>
+            <ul class="uk-list uk-list-line" style="margin-bottom: 15px; font-size: 14px;">
+                <li><a target="_self" href="#"><img style="width: 156px" src="/static/img/qianlin_beijing.png"  alt="作者本人" /></a></li>
+                <li><a target="_self" href="#">个人简介</a></li>
+                <li><a target="_self" href="#">文章：78，留言：56</a></li>
             </ul>
         </div>
     </div>
-    -->
+{% endblock %}
+
+
+{% block content_catalog %}
+    <nav id="nav" class="clearfix" style="flex-direction: column;justify-content: center">
+        <ul class="uk-list" style="flex-direction: column;justify-content: center">
+            <li class="active"><a href="/">分类</a></li>
+            <li class=""><a target="_self" href="#">最新文章</a></li>
+            <li class=""><a target="_self" href="#">读书&分享</a></li>
+            <li class=""><a target="_self" href="#">Python编程</a></li>
+            <li class=""><a target="_self" href="#">图像处理</a></li>
+            <li class=""><a target="_self" href="#">自动化运维</a></li>
+            <li class=""><a target="_self" href="#">数据库</a></li>
+            <li class=""><a target="_self" href="#">前端</a></li>
+            <li class=""><a target="_self" href="#">编程语言</a></li>
+            <li class=""><a target="_self" href="#">架构</a></li>
+            <li class=""><a target="_self" href="#">安全</a></li>
+            <li class=""><a target="_self" href="#">其他</a></li>
+        </ul>
+    </nav>
+
 {% endblock %}
