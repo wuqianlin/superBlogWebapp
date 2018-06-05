@@ -285,7 +285,7 @@ blockquote p:last-of-type {
 }
 code {
 	color:#d05;
-	font-size:12px;
+	font-size:14px;
 	white-space:nowrap;
 	padding:0 4px;
 	border:1px solid #ddd;
@@ -300,8 +300,9 @@ pre code {
 	background:0 0
 }
 pre {
-	padding:10px;
-	background:#fafafa;
+	padding:5px;
+	/* background:#fafafa; */
+	background: #282a36;
 	color:#444;
 	font-size:12px;
 	line-height:18px;

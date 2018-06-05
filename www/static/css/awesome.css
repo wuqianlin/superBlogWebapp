@@ -173,6 +173,7 @@ a:hover, a:active {
     display: flex;
     flex-flow: column wrap;
     flex-basis: 100%;
+    margin-bottom:50px;
 }
 .comments-container div {
     display: flex;
