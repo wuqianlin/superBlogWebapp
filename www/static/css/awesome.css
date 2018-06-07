@@ -83,7 +83,8 @@ a:hover, a:active {
 .content-right {
     display: flex;
     order: 3;
-    flex-direction: row-reverse;
+    flex-direction: row;
+    justify-content: flex-start;
     align-items: flex-start;
     width: 16%;
     margin-left: 15px;
@@ -99,6 +100,15 @@ a:hover, a:active {
     font-family:'宋体';
     font-size:18px;
     width: auto;
+}
+.blogs-list-content li{
+    list-style-type:none;
+    height: 85px;
+    width: 712px;
+    padding: 18px 24px 18px 24px;
+    border-color:#f4f4f4;
+    border-style:none none solid none;
+    border-width:1px;"
 }
 .blogs-list-content>ul{
     padding-left: 0px;
@@ -132,7 +142,16 @@ a:hover, a:active {
     color: #ca0c16;
     text-decoration:none;
 }
-
+.blogs-list-end {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    margin-bottom: 0px;
+    font-size: 15px;
+    color: #8a8a8a;
+    border-bottom: 10px solid #ddd;
+    border-color:#F2F4F5;
+}
 
 .blogs-list-date {
     font-family:'宋体';
@@ -262,6 +281,25 @@ a:hover, a:active {
     flex-grow:1;
     width: auto;
 }
-
-
-
+.copyright {
+    margin-top:0px;
+    background-color:#F2F4F5;
+    border-top:1px solid #ddd;
+    font-size:13px;
+    padding-top:10px;
+    padding-bottom:30px;
+}
+.copyright p{
+    margin-top:0px;
+    margin-bottom:0px;
+}
+.post-right {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #ddd;
+	color: #444;
+    width: 100%;
+    background-color: #ffffff;"
+}

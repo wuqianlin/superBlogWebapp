@@ -11,7 +11,7 @@
     <div class="blogs-list-content">
         <ul>
             {% for blog in blogs %}
-            <li style="list-style-type:none; height: 85px; width: 712px; padding: 18px 24px 18px 24px; border-color:#f4f4f4; border-style:none none solid none; border-width:1px;">
+            <li>
                 <div style="">
                     <div>
                         <span>
@@ -29,7 +29,7 @@
 
                         <dt>
                             <a href="#" target="_blank" class="user_img">
-                                <img class="super-comment-header"  style="flex: 0;" src="/static/img/firefly.jpeg">
+                                <img class="super-comment-header"  style="flex: 0;" src="/static/img/me.jpg">
                             </a>
                         </dt>
 
@@ -71,19 +71,28 @@
                 </div>
             </li>
             {% endfor %}
+            <div class="blogs-list-end">
+                <p>哈哈哈，到底了...</p>
+            </div>
         </ul>
     </div>
 {% endblock %}
 
 
 {% block poster_board %}
-    <div class="uk-panel uk-panel-header" style="width: 100%; background-color: #ffffff;">
-        <div style="margin: 3px 8px 3px 8px;">
-            <h3 class="uk-panel-title" style="margin-top: 10px;margin-bottom: 8px; padding-bottom: 2px;">关于</h3>
+    <div class="post-right">
+        <div style="margin: 12px 8px 3px 8px;">
+            <h3 class="uk-panel-title" style="margin-top: 10px;margin-bottom: 4px; padding-bottom: 2px;border-bottom: 1px solid #ddd;">关于</h3>
             <ul class="uk-list uk-list-line" style="margin-bottom: 15px; font-size: 14px;">
-                <li><a target="_self" href="#"><img style="width: 156px" src="/static/img/qianlin_beijing.png"  alt="作者本人" /></a></li>
-                <li><a target="_self" href="#">个人简介</a></li>
+                <li><a target="_self" href="#"><img style="width: 156px" src="/static/img/me.jpg"  alt="作者本人" /></a></li>
+                <li><a target="_self" href="#">个人简介 .  我的邮件</a></li>
                 <li><a target="_self" href="#">文章：78，留言：56</a></li>
+                <li>
+                    <a target="_blank" href="https://github.com/Duke-Wu" class="uk-icon-button uk-icon-github"></a>
+                    <a target="_blank" href="https://www.linkedin.com/in/乾林-吴-52635b166" class="uk-icon-button uk-icon-linkedin-square"></a>
+                    <a target="_blank" href="https://twitter.com/qianlin95" class="uk-icon-button uk-icon-twitter"></a>
+                    <a target="_blank" href="http://weibo.com/wuqianlin" class="uk-icon-button uk-icon-weibo"></a>
+                </li>
             </ul>
         </div>
     </div>
