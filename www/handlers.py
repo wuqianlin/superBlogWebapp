@@ -250,9 +250,11 @@ def editor_md( submit ):
 @post('/api/blogs/{id}/comments')
 def api_create_comment(id, request, *, content, parent_id=''):
 
-    #user = request.__user__
-    #if user is None:
-    #    raise APIPermissionError('Please signin first.')
+    user = request.__user__
+    if user is None:
+        #raise APIPermissionError('Please signin first.')
+        return json.dumps('success')
+
     if not content or not content.strip():
         raise APIValueError('content')
     blog = yield from Blog.find(id)

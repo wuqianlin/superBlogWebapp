@@ -26,15 +26,19 @@
     <link rel="stylesheet" href="/static/css/uikit.min.css">
     <link rel="stylesheet" href="/static/css/uikit.gradient.min.css">
     <link rel="stylesheet" href="/static/css/awesome.css" />
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/sha1.min.js"></script>
-    <script src="/static/js/uikit.min.js"></script>
-    <script src="/static/js/sticky.min.js"></script>
-    <script src="/static/js/vue.min.js"></script>
-    <script src="/static/js/awesome.js"></script>
     <link rel="stylesheet" href="/static/css/dracula.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <!-- <script type="application/javascript" src="/static/js/jquery.min.js"></script> -->
+    <script type="application/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="application/javascript" src="/static/js/sha1.min.js"></script>
+    <script type="application/javascript" src="/static/js/uikit.min.js"></script>
+    <script type="application/javascript" src="/static/js/sticky.min.js"></script>
+    <script type="application/javascript" src="/static/js/vue.min.js"></script>
+    <script type="application/javascript" src="/static/js/awesome.js"></script>
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script type="application/javascript" src="/static/layer/layer.js"></script>
     <script >hljs.initHighlightingOnLoad();</script>
+
     <script type="text/javascript">
         var _hmt = _hmt || [];
         (function() {
@@ -46,8 +50,6 @@
     </script>
     {% block beforehead %}<!-- before head  -->{% endblock %}
 </head>
-
-<body>
     <nav class="uk-navbar uk-navbar-attached" style="background-color: #F5F4F5;">
         <div class="uk-container uk-container-center">
             <a href="/" class="uk-navbar-brand"><img src="/static/img/qianlin3.jpg" width="62" height="100" alt="" /></a>
@@ -96,9 +98,7 @@
             {% block poster_board %}
             {% endblock %}
         </div>
-
     </div>
-
 
     <div class="copyright">
         <div class="uk-container uk-container-center uk-text-center">
@@ -120,6 +120,9 @@
             </div>
         </div>
     </div>
+
+    {%  block html_end %}
+    {% endblock %}
 
 </body>
 </html>

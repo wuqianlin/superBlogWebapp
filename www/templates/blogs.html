@@ -38,7 +38,22 @@ $(function () {
             if (err) {
                 return $form.showFormError(err);
             }
-            refresh();
+            if (result==='success') {
+                console.log(result);
+                //console.log($('#registerModal').html());
+                //页面层-自定义
+                layer.open({
+                  type: 1 //Page层类型
+                  ,area: ['600px', '480px']
+                  ,title:  ['你的信息', 'font-size:18px;font-weight:bold;font-family:inherit;']
+                  ,shade: 0.6 //遮罩透明度
+                  ,anim: 0 //0-6的动画形式，-1不开启
+                  ,fixed: false
+                  ,content: $('#registerModal').html()
+                });
+
+            }
+            //refresh();
         });
     });
 });
@@ -56,8 +71,6 @@ function comments_reply(temp) {
         }
     })
 }
-
-
 
 var reply_status;
 function comment_display(temp){
@@ -86,7 +99,6 @@ function quote_replay(temp) {
     target.css('display','');
     target.find('textarea').text(quote_content)
 }
-
 </script>
 
 {% endblock %}
@@ -218,4 +230,43 @@ function quote_replay(temp) {
     </div>
     -->
 {% endblock %}
+
+{%  block html_end %}
+    <script id="registerModal" type="text/template">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form action="/api/user/register" method="POST" role="form" class="mt15">
+
+                    <div class="form-group">
+                        <label for="name" class="control-label">你的名字</label>
+                        <input type="text" class="form-control" name="name" required="" placeholder="必填*真实姓名或常用昵称">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mail" class="control-label">电子邮件</label>
+                        <input type="text" class="form-control" id="login-name" name="mail" required="" placeholder="必填*不公开">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mail" class="control-label">个人网址</label>
+                        <input type="text" class="form-control" id="login-name" name="mail" required="" placeholder="选填*请勿填写广告链接">
+                    </div>
+
+                    <div class="form-checkbox">
+                        <input type="checkbox" name="radio" value="true" checked="checked">&nbsp;记住个人信息？
+                    </div>
+
+                    <div class="form-group clearfix" style="text-align: center;">
+                        <button type="submit" class="btn-primary btn-block pr20 pl20" onclick="">保存</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer hidden">
+            </div>
+        </div>
+
+    </script>
+{% endblock %}
+
+
 
