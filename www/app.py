@@ -58,7 +58,7 @@ def auth_factory(app, handler):
         request.__user__ = None
 
         cookie_str = request.cookies.get(COOKIE_NAME)
-        logging.info('cookie_srt : %s' % cookie_str)
+        logging.info('cookie_str : %s' % cookie_str)
         if cookie_str:
             user = yield from cookie2user(cookie_str)
             if user:

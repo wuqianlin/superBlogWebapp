@@ -19,11 +19,13 @@ class User(Model):
 
     id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
     email = StringField(ddl='varchar(50)')
-    passwd = StringField(ddl='varchar(50)')
-    admin = BooleanField()
+    passwd = StringField(ddl='varchar(50)', default='')
+    admin = BooleanField(default=0)
     name = StringField(ddl='varchar(50)')
-    image = StringField(ddl='varchar(500)')
+    image = StringField(ddl='varchar(500)', default='')
     created_at = FloatField(default=time.time)
+    site = StringField(ddl='varchar(500)', default='')
+    private = BooleanField(default=1)
 
 class Blog(Model):
     __table__ = 'blogs'

@@ -50,6 +50,7 @@ $(function () {
                   ,anim: 0 //0-6的动画形式，-1不开启
                   ,fixed: false
                   ,content: $('#registerModal').html()
+                    //,content: "hello"
                 });
 
             }
@@ -99,6 +100,7 @@ function quote_replay(temp) {
     target.css('display','');
     target.find('textarea').text(quote_content)
 }
+
 </script>
 
 {% endblock %}
@@ -232,40 +234,155 @@ function quote_replay(temp) {
 {% endblock %}
 
 {%  block html_end %}
+
     <script id="registerModal" type="text/template">
-        <div class="modal-content">
+        <div class="modal-content" >
             <div class="modal-body">
-                <form action="/api/user/register" method="POST" role="form" class="mt15">
+                <form id="vist" v-on="submit: submit" role="form" class="mt15">
 
                     <div class="form-group">
                         <label for="name" class="control-label">你的名字</label>
-                        <input type="text" class="form-control" name="name" required="" placeholder="必填*真实姓名或常用昵称">
+                        <input type="text" name="name" class="form-control"  required="" placeholder="必填*真实姓名或常用昵称">
                     </div>
 
                     <div class="form-group">
                         <label for="mail" class="control-label">电子邮件</label>
-                        <input type="text" class="form-control" id="login-name" name="mail" required="" placeholder="必填*不公开">
+                        <input name="email" type="text" class="form-control" id="login-name" required="" placeholder="必填*不公开">
                     </div>
 
                     <div class="form-group">
                         <label for="mail" class="control-label">个人网址</label>
-                        <input type="text" class="form-control" id="login-name" name="mail" required="" placeholder="选填*请勿填写广告链接">
+                        <input name="site" type="text" class="form-control" id="login-name" required="" placeholder="选填*请勿填写广告链接">
                     </div>
 
                     <div class="form-checkbox">
-                        <input type="checkbox" name="radio" value="true" checked="checked">&nbsp;记住个人信息？
+                        <input name="private" type="checkbox" value="1" checked="checked">&nbsp;记住个人信息？
                     </div>
 
                     <div class="form-group clearfix" style="text-align: center;">
-                        <button type="submit" class="btn-primary btn-block pr20 pl20" onclick="">保存</button>
+                        <button type="submit" onclick="visitor()" class="btn-primary btn-block pr20 pl20" >保存</button>
                     </div>
                 </form>
             </div>
             <div class="modal-footer hidden">
             </div>
         </div>
+    </script>
+
+
+    <!--
+    <div id="registerModal" v-show="local">
+        <div class="modal-content" >
+            <div class="modal-body">
+                <form id="vist" v-on="submit: submit" role="form" class="mt15">
+
+                    <div class="form-group">
+                        <label for="name" class="control-label">你的名字</label>
+                        <input type="text" name="name" class="form-control"  required="" placeholder="必填*真实姓名或常用昵称">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mail" class="control-label">电子邮件</label>
+                        <input name="email" type="text" class="form-control" id="login-name" required="" placeholder="必填*不公开">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mail" class="control-label">个人网址</label>
+                        <input name="site" type="text" class="form-control" id="login-name" required="" placeholder="选填*请勿填写广告链接">
+                    </div>
+
+                    <div class="form-checkbox">
+                        <input name="private" type="checkbox" value="true" checked="checked">&nbsp;记住个人信息？
+                    </div>
+
+                    <div class="form-group clearfix" style="text-align: center;">
+                        <button type="submit" onclick="visitor()" class="btn-primary btn-block pr20 pl20" >保存</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer hidden">
+            </div>
+        </div>
+    </div>
+    -->
+
+    <script>
+
+
+        function validateEmail(email) {
+            var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
+            return re.test(email.toLowerCase());
+        }
+
+        var vist = new Vue({
+            el: '#vist',
+            data: {
+                name: '',
+                email: '',
+                password1: '',
+                password2: ''
+            },
+            methods: {
+                submit: function (event) {
+                    event.preventDefault();
+                    console.log("---------------------");
+                    var $form = $('#vist');
+                    if (!this.name.trim()) {
+                        return $form.showFormError('请输入名字');
+                    }
+                    if (!validateEmail(this.email.trim().toLowerCase())) {
+                        return $form.showFormError('请输入正确的Email地址');
+                    }
+                    //if (this.password1.length < 6) {
+                    //    return $form.showFormError('口令长度至少为6个字符');
+                    //}
+                    //if (this.password1 !== this.password2) {
+                    //    return $form.showFormError('两次输入的口令不一致');
+                    //}
+                    var email = this.email.trim().toLowerCase();
+                    $form.postJSON('/api/visitors', {
+                        name: this.name.trim(),
+                        email: email,
+                        //passwd: CryptoJS.SHA1(email + ':' + this.password1).toString()
+                    }, function (err, r) {
+                        if (err) {
+                            return $form.showFormError(err);
+                        }
+                        return location.assign('/signin');
+                    });
+                }
+            }
+        });
+
+        var local = new Vue({
+            el:'#registerModal',
+            data: {
+                local: false
+            }
+        });
+
+        function visitor() {
+                $.ajax({
+                    type: "POST",  //方法类型
+                    dataType: "json",  //预期服务器返回的数据类型
+                    url: "/api/visitors" ,
+                    data: $('#vist').serialize(),
+                    success: function (result) {
+                        console.log(result);
+                        if (result.resultCode == 200) {
+                            alert("SUCCESS");
+                        }
+                    },
+                    error : function() {
+                        alert("异常！");
+                    }
+                });
+            }
+
 
     </script>
+
+
 {% endblock %}
 
 
