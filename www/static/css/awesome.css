@@ -271,8 +271,8 @@ a:hover, a:active {
     border-radius: 50%;
     background-color: #adadad;
     margin-top: 10px;
-    margin-left: 12px;
-    margin-right: 12px;
+    margin-left: 8px;
+    margin-right: 8px;
 }
 .blogs_read_num {
     display: flex;
