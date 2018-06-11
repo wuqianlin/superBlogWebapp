@@ -4,6 +4,7 @@
 
 {% block beforehead %}
 <script>
+
 </script>
 {% endblock %}
 
@@ -21,8 +22,7 @@
                         </span>
                     </div>
                     <div style="text-overflow: ellipsis; white-space: nowrap;overflow: hidden;margin-bottom: 4px; font-size: 13px; color: #8a8a8a; line-height: 24px;">
-                        2018年6月3日，由中国IT技术社区CSDN和专注以太坊生态建设的领先企业灵钛科技主办，以太坊爱好者社区、柏链道捷、火星财经、金色财经、Unitimes、区块链大本营协办的「2018以太坊技术及应用大会·中国」在北京·悠唐皇冠假日酒店隆重举行。
-                        本次大会围绕以太坊生态、以太坊核心技术、以太坊优质应用展开，邀请了众多国内外顶级开发者、以太坊团队核心成员，以及顶级项目负责人齐聚于此，共同助力中国以...
+                        <p>{{ blog.content }}</p>
                     </div>
 
                     <dl class="list_userbar">
@@ -50,8 +50,8 @@
 
                         <!--阅读 begin-->
                         <dd class="blogs_read_num">
-                            <a href="#" target="_blank">
-                                <span class="num">2233</span>
+                            <a href="/api/blogs/{{ blog.id }}">
+                                <span class="num">{{ blog.read_total }}</span>
                                 <span class="text">阅读</span>
                             </a>
                         </dd>
@@ -60,8 +60,8 @@
                         <!--新增评论数+阅读 begin-->
                         <div class="interval"></div>
                         <dd>
-                            <a href="#" target="_blank">
-                                <span class="num">17</span>
+                            <a href="/api/blogs/{{ blog.id }}" target="_blank">
+                                <span class="num">{{ blog.comments_amount }}</span>
                                 <span class="text">评论</span>
                             </a>
                         </dd>
@@ -86,7 +86,7 @@
             <ul class="uk-list uk-list-line" style="margin-bottom: 15px; font-size: 14px;">
                 <li><a target="_self" href="#"><img style="width: 156px" src="/static/img/me.jpg"  alt="作者本人" /></a></li>
                 <li><a target="_self" href="#">个人简介 .  我的邮件</a></li>
-                <li><a target="_self" href="#">文章：78，留言：56</a></li>
+                <li><a id='doc_info' target="_self" href="#"></a></li>
                 <li>
                     <a target="_blank" href="https://github.com/Duke-Wu" class="uk-icon-button uk-icon-github"></a>
                     <a target="_blank" href="https://www.linkedin.com/in/乾林-吴-52635b166" class="uk-icon-button uk-icon-linkedin-square"></a>
@@ -96,6 +96,25 @@
             </ul>
         </div>
     </div>
+
+    <script>
+    $(function () {
+        $.ajax({
+            url: '/api/doc_info',
+            type: "GET",
+            dataType: 'json',
+            success:function(result){
+                console.log(result);
+                amount_blog = result.rs_blog.record_amount;
+                console.log(typeof(result) );
+                amount_comment = result.rs_comment.record_amount;
+                content = '文章：' + amount_blog  + '，留言：' + amount_comment;
+                $(doc_info).html(content);
+            }
+        })
+    });
+
+    </script>
 {% endblock %}
 
 

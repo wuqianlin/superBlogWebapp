@@ -3,14 +3,21 @@
 __author__ = 'duke.wu'
 
 ' url handlers '
-
-import re, time, json, logging, hashlib, base64, asyncio
+import mistune
+import re
+import time
+import json
+import logging
+import hashlib
+import base64
+import asyncio
 from aiohttp import web
+
 from coroweb import get, post
 from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError
 from models import User, Comment, Blog, Label, next_id
 from config import configs
-import mistune
+
 
 
 COOKIE_NAME = 'awesession'
@@ -79,7 +86,21 @@ def cookie2user(cookie_str):
 
 @get('/')
 def index():
-    blogs = yield from Blog.findAllOrderBy(created_at='created_at')
+    sql = "select `id`,`user_id`,`user_name`,`user_image`,`name`,`summary`," \
+          "SUBSTRING(content,1,150) AS `content`,`limit`,`label`,`read_total`," \
+          "`created_at`,`latestupdated_at` from blogs ORDER BY `created_at` DESC;"
+
+    blogs = yield from Blog.execute2(sql)
+
+    if blogs:
+        for blog in blogs:
+            comments = yield from Comment.findAll(blog_id=blog.get("id"))
+            comments_amount = len(comments)
+            blog.setdefault('comments_amount', comments_amount)
+            #return json.dumps(comments_amount)
+
+    #blogs = yield from Blog.findAllOrderBy(created_at='created_at')
+
     return {
         '__template__': 'blogslist.html',
         'blogs':blogs
@@ -112,6 +133,16 @@ def getsignin():
     return {
         '__template__': 'getsignin.html'
     }
+
+@get('/api/doc_info')
+def getsignin():
+    doc_info = dict()
+    rs_blog = yield  from Blog.record_amount()
+    rs_comment =  yield from Comment.record_amount()
+    doc_info.setdefault('rs_blog', rs_blog[0])
+    doc_info.setdefault('rs_comment', rs_comment[0])
+
+    return json.dumps(doc_info)
 
 
 @post('/api/authenticate')
@@ -280,6 +311,20 @@ def api_create_comment(id, request, *, content, parent_id=''):
     yield from comment.save()
     return comment
 
+
+@get('/api/blogs/{id}/comments_amount')
+def api_get_comment_amount(id, request):
+    """
+    根据 blog id 获取评论数
+    :param id:
+    :param request:
+    :return:
+    """
+    comments = yield from Comment.findAll(blog_id=id)
+    comments_amount = len(comments)
+    return json.dumps(comments_amount)
+
+
 @get('/api/blogs/{id}/comments')
 def api_get_comment(id, request):
     user = request.__user__
@@ -361,7 +406,7 @@ def api_register_user(*, email, name, passwd):
 
 
 @post('/api/visitors')
-def api_register_visitor(*, name, email, site, private):
+def api_register_visitor(*, name, email, site, private=0):
     if not name or not name.strip():
         raise APIValueError('name')
     if not email or not _RE_EMAIL.match(email):
@@ -433,6 +478,10 @@ def api_get_blog(*, id):
     #for c in comments:
     #    c['html_content'] = text2html(c['content'])
 
+    if blog:
+
+        blog.read_total += 1
+        yield from blog.update()
 
     #comments = get_comments(id)
     comments = yield from Comment.findAll(blog_id=id)

@@ -38,6 +38,7 @@ class Blog(Model):
     summary = StringField(ddl='varchar(200)')
     content = TextField()
     label = StringField(ddl='varchar(50)')
+    read_total =  IntegerField(default=0)
     limit = BooleanField()
     created_at = FloatField(default=time.time)
     latestupdated_at = FloatField(default=time.time)

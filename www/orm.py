@@ -76,6 +76,17 @@ def select(sql, args, size=None):
         logging.info('rows returned: %s' % len(rs))
         return rs
 
+
+@asyncio.coroutine
+def select2(sql):
+    global __pool
+    with (yield from __pool) as conn:
+        cur = yield from conn.cursor(aiomysql.DictCursor)
+        yield from cur.execute(sql)
+        rs = yield from cur.fetchall()
+        yield from cur.close()
+        return rs
+
 '''
     要执行INSERT、UPDATE、DELETE语句，
     可以定义一个通用的execute()函数，
@@ -98,6 +109,19 @@ def execute(sql, args):
         except BaseException as e:
             raise
         return affected
+
+@asyncio.coroutine
+def execute2(sql):
+    with (yield from __pool) as conn:
+        try:
+            rs = []
+            cur = yield from conn.cursor()
+            yield from cur.execute(sql)
+            rs = yield from cur.fetchall()
+            yield from cur.close()
+        except BaseException as e:
+            raise
+        return rs
 
 '''首先要定义的是所有ORM映射的基类Model：'''
 
@@ -196,6 +220,7 @@ class ModelMetaclass(type):
         print( attrs['__insert__'] )
         attrs['__update__'] = 'update `%s` set %s where `%s`=?' % (tableName, ', '.join(map(lambda f: '`%s`=?' % (mappings.get(f).name or f), fields)), primaryKey)
         attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (tableName, primaryKey)
+        attrs['__record_amount__'] = 'select count(*) as `record_amount` from `%s`' % tableName
         return type.__new__(cls, name, bases, attrs)
 
 '''首先要定义的是所有ORM映射的基类Model：'''
@@ -331,6 +356,18 @@ class Model(dict, metaclass=ModelMetaclass):
             rs = yield from select('%s ORDER BY %s DESC' % (cls.__select__, values[0]), None)
         return rs
 
+    @classmethod
+    @asyncio.coroutine
+    def execute2(self, sql):
+        rs = select2(sql)
+        return rs
+
+    @classmethod
+    @asyncio.coroutine
+    def record_amount(cls):
+        rs = yield from select2(cls.__record_amount__)
+        return rs
+
     @asyncio.coroutine
     def save(self):
         args = list(map(self.getValueOrDefault, self.__fields__))
@@ -398,6 +435,7 @@ if __name__ == "__main__":
         kw = {'user': 'root', 'db': 'awesome', 'host': '127.0.0.1', 'port': 3306, 'password': 'mac1234'}
         yield from create_pool(loop=loop, **kw)
         print( dir(User))
+
         bb = yield from Blog.find_all()
         cc = yield from Blog.findAllOrderBy(orderby='created_at')
         print('------', cc)
