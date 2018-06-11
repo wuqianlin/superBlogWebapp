@@ -27,7 +27,7 @@ _COOKIE_KEY = configs.session.secret
 
 def check_admin(request):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError( )
+        raise APIPermissionError("没有授权")
 
 def get_page_index(page_str):
     p = 1
@@ -123,7 +123,8 @@ def register():
     }
 
 @get('/signin')
-def signin():
+def signin(request):
+    logging.info(dir(request))
     return {
         '__template__': 'signin.html'
     }
@@ -203,7 +204,7 @@ def signout(request):
 
 @get('/manage/')
 def manage():
-    return 'redirect:/manage/comments'
+    return 'redirect:/manage/blogs'
 
 @get('/manage/comments')
 def manage_comments(*, page='1'):
@@ -215,8 +216,8 @@ def manage_comments(*, page='1'):
 @get('/manage/blogs')
 def manage_blogs(request):
     check_admin(request)
-    blogs = yield from Blog.findAll()
-    print(blogs)
+    #blogs = yield from Blog.findAll(orderBy='created_at desc')
+    blogs = yield  from Blog.findAllOrderBy(created_at='created_at')
     return {
         '__template__': 'blogs_manage.html',
         'blogs':blogs

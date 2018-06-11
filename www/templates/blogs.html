@@ -99,6 +99,12 @@ function quote_replay(temp) {
     target.find('textarea').text(quote_content)
 }
 
+$(function(){
+    $("#top").click(function() {
+        $("html,body").animate({scrollTop:0}, 800);
+    });
+})
+
 </script>
 
 {% endblock %}
@@ -213,6 +219,10 @@ function quote_replay(temp) {
         </div>
         <hr class="uk-article-divider">
         {# {% endif %}  #}
+    </div>
+
+    <div id="top" style="z-index: 9999; position: fixed ! important; right: 30px; bottom: 50px;">
+        <a>回到顶部</a>
     </div>
 {% endblock %}
 

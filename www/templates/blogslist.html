@@ -5,6 +5,20 @@
 {% block beforehead %}
 <script>
 
+function personal_infor( ) {
+    console.log($('personal_info').html() );
+    layer.open({
+        type: 1,
+        fixed: false,
+        title: false,
+        closeBtn: 1,
+        scrollbar: true,
+        shadeClose: true,
+        skin: 'yourclass',
+        content: $('#personal_info').html()
+    });
+}
+
 </script>
 {% endblock %}
 
@@ -85,7 +99,7 @@
             <h3 class="uk-panel-title" style="margin-top: 10px;margin-bottom: 4px; padding-bottom: 2px;border-bottom: 1px solid #ddd;">关于</h3>
             <ul class="uk-list uk-list-line" style="margin-bottom: 15px; font-size: 14px;">
                 <li><a target="_self" href="#"><img style="width: 156px" src="/static/img/me.jpg"  alt="作者本人" /></a></li>
-                <li><a target="_self" href="#">个人简介 .  我的邮件</a></li>
+                <li><a target="_self" onclick="personal_infor()" href="#">个人简介</a></li>
                 <li><a id='doc_info' target="_self" href="#"></a></li>
                 <li>
                     <a target="_blank" href="https://github.com/Duke-Wu" class="uk-icon-button uk-icon-github"></a>
@@ -96,6 +110,18 @@
             </ul>
         </div>
     </div>
+
+    <div id="personal_info" style="display: none;">
+        <div  class="personal">
+            <h3>About Me</h3>
+            <p>My name is Qianlin Wu. You can call me Duke.</p>
+            <p>I am an IT developer focusing on web technology, image science and a strong advocate and believer of Free Software. Now I am employed as a python engineer.</p>
+            <p>In spare time, I like reading book, rock climbing, watching movie and driving in the mountains.</p>
+            <p>My email is: <strong><u>simpleran@sina.com</u></strong></p>
+        </div>
+    </div>
+
+
 
     <script>
     $(function () {
@@ -113,8 +139,8 @@
             }
         })
     });
-
     </script>
+
 {% endblock %}
 
 

@@ -399,3 +399,10 @@ a:hover, a:active {
 .pl20, .pl-20 {
     padding-left: 20px !important;
 }
+.personal {
+    margin: 20px;
+}
+.personal h3{
+    border-bottom: 1px solid #ccc;
+
+}

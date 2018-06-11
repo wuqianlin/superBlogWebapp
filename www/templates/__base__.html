@@ -59,6 +59,15 @@
                 <li><a target="_self" href="/project/python"><i class="uk-icon-book"></i> 读书&分享</a></li>
                 <li><a target="_self" href="/project/opera"><i class="uk-icon-book"></i> 健身&攀岩</a></li>
                 <li><a target="_self" href="/project/image"><i class="uk-icon-book"></i> 资源下载</a></li>
+                {% if __user__ and __user__.admin %}
+                    <li><a target="#" href="/manage/editor"><i class="uk-icon-book"></i><u> 新建笔记</u></a></li>
+                    <li><a target="_self" href="/manage/blogs"><i class="uk-icon-book"></i><u> 后台管理</u></a></li>
+                {% else %}
+                    <!--这是一段注释。注释不会在浏览器中显示。-->
+                    <!-- <li><a href="/signin"><i class="uk-icon-sign-in"></i> 登陆</a></li>
+                    <li><a href="/register"><i class="uk-icon-edit"></i> 注册</a></li> -->
+                {% endif %}
+
             </ul>
             <div class="uk-navbar-flip">
                 <ul class="uk-navbar-nav">

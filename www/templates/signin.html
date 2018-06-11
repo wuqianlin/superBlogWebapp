@@ -31,7 +31,7 @@ $(function() {
                     };
                 $form.postJSON('/api/authenticate', data, function(err, result) {
                     if (! err) {
-                        location.assign('/');
+                        location.assign('/manage/blogs');
                     }
                 });
             }

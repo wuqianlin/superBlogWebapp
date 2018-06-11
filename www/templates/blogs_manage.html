@@ -13,8 +13,8 @@
         {% for blog in blogs %}
 
         <article class="uk-article">
-                <h2><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
-                <h6><a href="/blog/{{ blog.id }}">{{ blog.id }}</a></h6>
+                <h2><a href="/api/blogs/{{ blog.id }}">{{ blog.name }}</a></h2>
+                <h6><a href="/api/blogs/{{ blog.id }}">{{ blog.id }}</a></h6>
                 <p class="uk-article-meta">发表于{{ blog.created_at|datetime}}</p>
         </article>
 
