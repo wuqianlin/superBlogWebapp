@@ -262,7 +262,7 @@ class Model(dict, metaclass=MetaModel):
 
     @classmethod
     @asyncio.coroutine
-    def find(cls, **kw):
+    def filter(cls, **kw):
         if len(kw) == 0:
             rs = yield from select(cls.__select__, None)
         else:
