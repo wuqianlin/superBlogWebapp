@@ -126,6 +126,8 @@ def get_blogs_brief(request):
     blogs = yield from Blog.execute(sql)
     if blogs:
         status = 'success'
+        if len(blogs) < size:
+            info = "warning: 这是最后一页了！"
         for blog in blogs:
             comments = yield from Comment.find(blog_id=blog.get("id"))
             comments_amount = len(comments)
