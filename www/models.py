@@ -1,18 +1,20 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Models for user, blog, comment.
-'''
+"""
 
 __author__ = 'duke.wu'
 
-import time, uuid
-
+import time
+import uuid
 from orm import Model, StringField, BooleanField, FloatField, TextField, IntegerField
+
 
 def next_id():
     return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
+
 
 class User(Model):
     __table__ = 'users'
@@ -26,6 +28,7 @@ class User(Model):
     created_at = FloatField(default=time.time)
     site = StringField(ddl='varchar(500)', default='')
     private = BooleanField(default=1)
+
 
 class Blog(Model):
     __table__ = 'blogs'
@@ -43,6 +46,7 @@ class Blog(Model):
     created_at = FloatField(default=time.time)
     latestupdated_at = FloatField(default=time.time)
 
+
 class Comment(Model):
     __table__ = 'comments'
 
@@ -55,6 +59,7 @@ class Comment(Model):
     at_who = StringField(ddl='varchar(50)')
     content = TextField()
     created_at = FloatField(default=time.time)
+
 
 class Label(Model):
     __table__ = 'labels'
@@ -85,5 +90,4 @@ class Role(Model):
     name = StringField(ddl='varchar(50)')
     permissions = IntegerField(primary_key=True, default=Permission.LOGIN )
     description = StringField(ddl='varchar(100)')
-
 '''

@@ -30,9 +30,9 @@ a:hover, a:active {
 }
 .content-left {
     display: flex;
-    order: 1;
+    order: 3;
     flex-flow: row;
-    justify-content: flex-end;
+    justify-content: flex-start;
     width: 16%;
     height: 100%;
     margin-right: 15px;
@@ -82,9 +82,9 @@ a:hover, a:active {
 }
 .content-right {
     display: flex;
-    order: 3;
+    order: 1;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: flex-end;
     align-items: flex-start;
     width: 16%;
     margin-left: 15px;

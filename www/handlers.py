@@ -12,12 +12,10 @@ import hashlib
 import base64
 import asyncio
 from aiohttp import web
-
 from coroweb import get, post
 from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError
 from models import User, Comment, Blog, Label, next_id
 from config import configs
-
 
 
 COOKIE_NAME = 'awesession'
@@ -28,6 +26,7 @@ _COOKIE_KEY = configs.session.secret
 def check_admin(request):
     if request.__user__ is None or not request.__user__.admin:
         raise APIPermissionError("没有授权")
+
 
 def get_page_index(page_str):
     p = 1
@@ -84,32 +83,67 @@ def cookie2user(cookie_str):
         return None
 
 
-@get('/')
-def index():
-    sql = "select `id`,`user_id`,`user_name`,`user_image`,`name`,`summary`," \
-          "SUBSTRING(content,1,150) AS `content`,`limit`,`label`,`read_total`," \
-          "`created_at`,`latestupdated_at` from blogs ORDER BY `created_at` DESC;"
-
-    blogs = yield from Blog.execute2(sql)
-
-    if blogs:
-        for blog in blogs:
-            comments = yield from Comment.findAll(blog_id=blog.get("id"))
-            comments_amount = len(comments)
-            blog.setdefault('comments_amount', comments_amount)
-            #return json.dumps(comments_amount)
-
-    #blogs = yield from Blog.findAllOrderBy(created_at='created_at')
+@get('/waterfall')
+def waterfall():
 
     return {
-        '__template__': 'blogslist.html',
-        'blogs':blogs
+        '__template__': 'waterfall.html',
     }
+
+
+@get('/')
+def index():
+    return {
+        '__template__': 'blogslist.html',
+    }
+
+
+@get('/api/brief')
+def get_blogs_brief(request):
+    page = request.query.get('page', 1)
+    page = int(page)
+    size = request.query.get('size', 10)
+    size = int(size)
+    info = str()
+
+    if size <= 0 or size > 15:
+        size = 10
+        info = 'warning: 每页数量范围为(1 ~ 15)!'
+    if page <= 0:
+        page = 1
+        info = 'warning: 你的页码数不正确，应该正整数！'
+    blog_count = yield from Blog.count()
+    max_page = blog_count / size
+    if max_page > int(max_page):
+        max_page = int(max_page) + 1
+    if page > max_page:
+        info = 'warning: 页码数应小于最大页码数！'
+
+    start_step = (page - 1) * size
+    sql = "select `id`,`user_id`,`user_name`,`user_image`,`name`,`summary`," \
+          "SUBSTRING(content,1,150) AS `content`,`limit`,`label`,`read_total`," \
+          "`created_at`,`latestupdated_at` from blogs ORDER BY `created_at` DESC limit %i, %i;" % (start_step, size)
+    blogs = yield from Blog.execute(sql)
+    if blogs:
+        status = 'success'
+        for blog in blogs:
+            comments = yield from Comment.find(blog_id=blog.get("id"))
+            comments_amount = len(comments)
+            blog.setdefault('comments_amount', comments_amount)
+    else:
+        status = 'failed'
+    content = dict(status=status,
+                   page=page,
+                   size=size,
+                   max_page=max_page,
+                   info=info,
+                   data=blogs,)
+    return content
 
 
 @get('/project/{name}')
 def project_list(name):
-    blogs = yield from Blog.findAll(label=name)
+    blogs = yield from Blog.find(label=name)
     return {
         '__template__': 'blogslist.html',
         'blogs':blogs
@@ -122,6 +156,7 @@ def register():
         '__template__': 'register.html'
     }
 
+
 @get('/signin')
 def signin(request):
     logging.info(dir(request))
@@ -129,17 +164,19 @@ def signin(request):
         '__template__': 'signin.html'
     }
 
+
 @get('/getsignin')
 def getsignin():
     return {
         '__template__': 'getsignin.html'
     }
 
+
 @get('/api/doc_info')
 def getsignin():
     doc_info = dict()
-    rs_blog = yield  from Blog.record_amount()
-    rs_comment =  yield from Comment.record_amount()
+    rs_blog = yield from Blog.count()
+    rs_comment = yield from Comment.count()
     doc_info.setdefault('rs_blog', rs_blog[0])
     doc_info.setdefault('rs_comment', rs_comment[0])
 
@@ -153,8 +190,8 @@ def authenticate(*, email, passwd):
         raise APIValueError('email', 'Invalid email.')
     if not passwd:
         raise APIValueError('passwd', 'Invalid password.')
-    #users = yield from User.findAll('email=?', [email])
-    users = yield from User.findAll(email = email)
+    # users = yield from User.find('email=?', [email])
+    users = yield from User.find(email=email)
     if len(users) == 0:
         raise APIValueError('email', 'Email not exist.')
     user = users[0]
@@ -206,6 +243,7 @@ def signout(request):
 def manage():
     return 'redirect:/manage/blogs'
 
+
 @get('/manage/comments')
 def manage_comments(*, page='1'):
     return {
@@ -213,15 +251,16 @@ def manage_comments(*, page='1'):
         'page_index': get_page_index(page)
     }
 
+
 @get('/manage/blogs')
 def manage_blogs(request):
     check_admin(request)
-    #blogs = yield from Blog.findAll(orderBy='created_at desc')
-    blogs = yield  from Blog.findAllOrderBy(created_at='created_at')
+    blogs = yield from Blog.all(order_by='created_at desc')
     return {
         '__template__': 'blogs_manage.html',
-        'blogs':blogs
+        'blogs': blogs
     }
+
 
 '''
 @get('/manage/blogs')
@@ -265,26 +304,29 @@ def manage_users(*, page='1'):
         'page_index': get_page_index(page)
     }
 
+
 @get('/api/comments')
 def api_comments(*, page='1'):
     page_index = get_page_index(page)
-    num = yield from Comment.findNumber('count(id)')
+    num = yield from Comment.count()
     p = Page(num, page_index)
     if num == 0:
         return dict(page=p, comments=())
-    comments = yield from Comment.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
+    comments = yield from Comment.find(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, comments=comments)
 
+
 @post('/md')
-def editor_md( submit ):
-    print( submit )
+def editor_md(submit):
+    print(submit)
+
 
 @post('/api/blogs/{id}/comments')
 def api_create_comment(id, request, *, content, parent_id=''):
 
     user = request.__user__
     if user is None:
-        #raise APIPermissionError('Please signin first.')
+        # raise APIPermissionError('Please signin first.')
         return json.dumps('success')
 
     if not content or not content.strip():
@@ -315,13 +357,8 @@ def api_create_comment(id, request, *, content, parent_id=''):
 
 @get('/api/blogs/{id}/comments_amount')
 def api_get_comment_amount(id, request):
-    """
-    根据 blog id 获取评论数
-    :param id:
-    :param request:
-    :return:
-    """
-    comments = yield from Comment.findAll(blog_id=id)
+    """根据 blog id 获取评论数"""
+    comments = yield from Comment.find(blog_id=id)
     comments_amount = len(comments)
     return json.dumps(comments_amount)
 
@@ -331,7 +368,7 @@ def api_get_comment(id, request):
     user = request.__user__
     if user is None:
         raise APIPermissionError('Please signin first.')
-    comments = yield from Comment.findAll(blog_id=id)
+    comments = yield from Comment.find(blog_id=id)
     if comments is None:
         raise APIResourceNotFoundError('Comment')
 
@@ -360,14 +397,15 @@ def api_delete_comments(id, request):
     yield from c.remove()
     return dict(id=id)
 
+
 @get('/api/users')
 def api_get_users(*, page='1'):
     page_index = get_page_index(page)
-    num = yield from User.findNumber('count(id)')
+    num = yield from User.count()
     p = Page(num, page_index)
     if num == 0:
         return dict(page=p, users=())
-    users = yield from User.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
+    users = yield from User.find(orderBy='created_at desc', limit=(p.offset, p.limit))
     for u in users:
         u.passwd = '******'
     return dict(page=p, users=users)
@@ -384,8 +422,8 @@ def api_register_user(*, email, name, passwd):
         raise APIValueError('email')
     if not passwd or not _RE_SHA1.match(passwd):
         raise APIValueError('passwd')
-    #users = yield from User.findAll('email=?', [email])
-    users = yield from User.findAll( email= email)
+    # users = yield from User.find('email=?', [email])
+    users = yield from User.find( email= email)
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
@@ -413,7 +451,7 @@ def api_register_visitor(*, name, email, site, private=0):
     if not email or not _RE_EMAIL.match(email):
         raise APIValueError('email')
 
-    users = yield from User.findAll( email= email)
+    users = yield from User.find( email= email)
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
 
@@ -434,23 +472,21 @@ def api_register_visitor(*, name, email, site, private=0):
     return r
 
 
-
 @get('/api/blogs')
-def api_blogs(request,*, page='1'):
+def api_blogs(request, *, page='1'):
     check_admin(request)
     page_index = get_page_index(page)
-    num = yield from Blog.findNumber('count(id)')
+    num = yield from Blog.count()
     p = Page(num, page_index)
     if num == 0:
         return dict(page=p, blogs=())
-    blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
-    return dict(page=p, blogs=blogs)
-
+    blog = yield from Blog.find(orderBy='created_at desc', limit=(p.offset, p.limit))
+    return dict(page=p, blogs=blog)
 
 
 def get_comments(blog_id):
 
-    comments = yield from Comment.findAll(blog_id=blog_id)
+    comments = yield from Comment.find(blog_id=blog_id)
     if comments is None:
         raise APIResourceNotFoundError('Comment')
 
@@ -473,19 +509,19 @@ def get_comments(blog_id):
 
 @get('/api/blogs/{id}')
 def api_get_blog(*, id):
-    blog = yield from Blog.find(id)
-    #comments = yield from Comment.findAll(blog_id=id)
-    #comments = yield from Comment.findAll()
-    #for c in comments:
+    blog = yield from Blog.find(id=id)
+    # comments = yield from Comment.find(blog_id=id)
+    # comments = yield from Comment.find()
+    # for c in comments:
     #    c['html_content'] = text2html(c['content'])
 
+    blog = blog[0]
     if blog:
-
         blog.read_total += 1
         yield from blog.update()
 
-    #comments = get_comments(id)
-    comments = yield from Comment.findAll(blog_id=id)
+    # comments = get_comments(id)
+    comments = yield from Comment.find(blog_id=id)
     if comments is None:
         raise APIResourceNotFoundError('Comment')
 
@@ -526,16 +562,16 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
     check_admin(request)
     if not name or not name.strip():
         raise APIValueError('name', 'name cannot be empty.')
-    #if not content or not content.strip():
+    # if not content or not content.strip():
     #    raise APIValueError('content', 'content cannot be empty.')
     if blogid == '':
-        blog = Blog(user_id = request.__user__.id,
-                    user_name = request.__user__.name,
-                    user_image = request.__user__.image,
-                    name = name,
-                    label = label,
-                    content = content,
-                    limit = limit)
+        blog = Blog(user_id=request.__user__.id,
+                    user_name=request.__user__.name,
+                    user_image=request.__user__.image,
+                    name=name,
+                    label=label,
+                    content=content,
+                    limit=limit)
         yield from blog.save()
         return json.dumps(blog.id)
     else:
@@ -548,12 +584,12 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
         blog.label = label,
         blog.content = content,
         blog.limit = limit
-        yield from blog.update( )
+        yield from blog.update()
         return json.dumps(blog.id)
 
 
 @get('/api/blogs/{id}/edit')
-def blogs_edit(id,request):
+def blogs_edit(id, request):
     check_admin(request)
     blog = yield from Blog.find(pk=id)
     return{
@@ -594,5 +630,24 @@ def api_delete_blog(id, request):
 
 @get('/api/lables')
 def api_get_lables( ):
-    blog = yield from Label.findAll( )
-    return json.dumps( blog )
+    blog = yield from Label.all()
+    return json.dumps(blog)
+
+
+@get('/api/blogs-summary')
+def api_get_blogs_summary():
+    sql = "select `id`,`user_id`,`user_name`,`user_image`,`name`,`summary`," \
+          "SUBSTRING(content,1,150) AS `content`,`limit`,`label`,`read_total`," \
+          "`created_at`,`latestupdated_at` from blogs ORDER BY `created_at` DESC;"
+
+    blogs = yield from Blog.execute2(sql)
+
+    if blogs:
+        for blog in blogs:
+            comments = yield from Comment.find(blog_id=blog.get("id"))
+            comments_amount = len(comments)
+            blog.setdefault('comments_amount', comments_amount)
+    return {
+        '__template__': 'blogslist.html',
+        'blogs': blogs
+    }

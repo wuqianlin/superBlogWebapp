@@ -53,12 +53,11 @@
         <div class="uk-container uk-container-center">
             <a href="/" class="uk-navbar-brand"><img src="/static/img/qianlin3.jpg" width="62" height="100" alt="" /></a>
             <ul class="uk-navbar-nav">
-                <li data-url="blogs"><a href="/"><i class="uk-icon-home"></i> 首页</a></li>
-                <li><a target="_self" href="/project/read"><i class="uk-icon-book"></i> Python编程</a></li>
-                <li><a target="#" href="https://bm.wuqianlin.cn/"><i class="uk-icon-book"></i> 书签收藏</a></li>
-                <li><a target="_self" href="/project/python"><i class="uk-icon-book"></i> 读书&分享</a></li>
-                <li><a target="_self" href="/project/opera"><i class="uk-icon-book"></i> 健身&攀岩</a></li>
-                <li><a target="_self" href="/project/image"><i class="uk-icon-book"></i> 资源下载</a></li>
+                <li data-url="blogs"><a href="/"><i class="uk-icon-home"></i> Home</a></li>
+                <li><a target="_self" href="/project/python"><i class="uk-icon-book"></i> Python</a></li>
+                <li><a target="_self" href="/project/read"><i class="uk-icon-book"></i> Django</a></li>
+                <li><a target="_self" href="/project/fitness"><i class="uk-icon-book"></i> Blog</a></li>
+                <li><a target="#" href="https://bm.wuqianlin.cn/"><i class="uk-icon-book"></i> About</a></li>
                 {% if __user__ and __user__.admin %}
                     <li><a target="#" href="/manage/editor"><i class="uk-icon-book"></i><u> 新建笔记</u></a></li>
                     <li><a target="_self" href="/manage/blogs"><i class="uk-icon-book"></i><u> 后台管理</u></a></li>
@@ -98,15 +97,21 @@
                 {% block content %}
                 {% endblock %}
         </div>
+    <!--
+    {#
         <div class="content-left">
-            {%  block content_catalog %}
+            {% block content_catalog %}
             {% endblock %}
         </div>
+
         <div class="content-right">
             {% block poster_board %}
             {% endblock %}
         </div>
+    #}
+    -->
     </div>
+
 
     <div class="copyright">
         <div class="uk-container uk-container-center uk-text-center">

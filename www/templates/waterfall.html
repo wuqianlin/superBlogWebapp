@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="aplus-terminal" content="1">
+  <meta name="apple-mobile-web-app-title" content="">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+    <meta name="format-detection" content="telephone=no, address=no">
+
+  <title>title</title>
+  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <script type="application/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+  <style type="text/css">
+    .main{
+      text-align: center;
+    }
+    .item{
+      width: 224px;
+      margin: 10px;
+      display: inline-block;
+    }
+    .item img{
+      width: 100%;
+    }
+    .price{
+      color: red;
+      display: flex;
+      justify-content: space-between;
+    }
+    .title{
+      width: 100%;
+      text-align: left;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+
+<body>
+    <div class="main">
+    </div>
+    <button class="btn btn-success more">加载更多</button>
+
+<script>
+    String.prototype.format = function(args) {
+        var result = this;
+        if (arguments.length > 0) {
+            if (arguments.length == 1 && typeof (args) == "object") {
+                for (var key in args) {
+                    if(args[key]!=undefined){
+                        var reg = new RegExp("({" + key + "})", "g");
+                        result = result.replace(reg, args[key]);
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < arguments.length; i++) {
+                    if (arguments[i] != undefined) {
+                        var reg= new RegExp("({)" + i + "(})", "g");
+                        result = result.replace(reg, arguments[i]);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    var page=1;
+    function page_url(page, size) {
+        //var dataUrl = 'http://127.0.0.1:9000/api/brief?page=' + page + '&size=1';
+        baseUrl = 'http://127.0.0.1:9000/api/brief';
+        dataUrl =  "{0}?page={1}&size={2}".format(baseUrl, page, size);
+        return dataUrl
+    }
+
+
+    //初始化页面数据
+    if (document.body.scrollHeight === window.innerHeight) {
+        askData(page_url(page,size=5));
+        page++;
+    }
+
+    //点击加载更多
+    $('.more').on('click', function () {
+        askData(page_url(page,size=5));
+        page++;
+    })
+
+
+    //滚动加载
+    window.onscroll = function(){
+        console.log('***********************');
+        var height = document.documentElement.scrollHeight - document.documentElement.scrollTop - window.innerHeight;
+        console.log(document.documentElement.scrollHeight)
+        console.log(document.documentElement.scrollTop)
+        console.log(window.innerHeight)
+        console.log(height)
+        console.log(page);
+
+        if (height < 300) {
+            askData(page_url(page,size=1));
+            page++
+        }
+    }
+
+
+    //异步请求数据
+    function askData(url){
+        console.log(url)
+        $.ajax({
+            type:"get",
+            url: url,
+            dataType: 'json',
+            crossDomain: true,
+            success: function (res) {
+                var data = res.data
+                loadDOM( data );
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+
+    //加载数据到页面
+    function loadDOM (data) {
+        for (var i in data){
+            var html = '<div>'+ data[i].content + '</div>';
+            $(html).appendTo('.main');
+        }
+    }
+</script>
+
+</body>
+</html>
