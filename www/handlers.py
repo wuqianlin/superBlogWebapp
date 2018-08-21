@@ -129,7 +129,7 @@ def get_blogs_brief(request):
         if len(blogs) < size:
             info = "warning: 这是最后一页了！"
         for blog in blogs:
-            comments = yield from Comment.find(blog_id=blog.get("id"))
+            comments = yield from Comment.filter(blog_id=blog.get("id"))
             comments_amount = len(comments)
             blog.setdefault('comments_amount', comments_amount)
     else:
@@ -192,7 +192,7 @@ def authenticate(*, email, passwd):
         raise APIValueError('email', 'Invalid email.')
     if not passwd:
         raise APIValueError('passwd', 'Invalid password.')
-    users = yield from User.find(email=email)
+    users = yield from User.filter(email=email)
     if len(users) == 0:
         raise APIValueError('email', 'Email not exist.')
     user = users[0]
@@ -313,7 +313,7 @@ def api_comments(*, page='1'):
     p = Page(num, page_index)
     if num == 0:
         return dict(page=p, comments=())
-    comments = yield from Comment.find(orderBy='created_at desc', limit=(p.offset, p.limit))
+    comments = yield from Comment.filter(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, comments=comments)
 
 
@@ -359,7 +359,7 @@ def api_create_comment(id, request, *, content, parent_id=''):
 @get('/api/blogs/{id}/comments_amount')
 def api_get_comment_amount(id, request):
     """根据 blog id 获取评论数"""
-    comments = yield from Comment.find(blog_id=id)
+    comments = yield from Comment.filter(blog_id=id)
     comments_amount = len(comments)
     return json.dumps(comments_amount)
 
@@ -369,7 +369,7 @@ def api_get_comment(id, request):
     user = request.__user__
     if user is None:
         raise APIPermissionError('Please signin first.')
-    comments = yield from Comment.find(blog_id=id)
+    comments = yield from Comment.filter(blog_id=id)
     if comments is None:
         raise APIResourceNotFoundError('Comment')
 
@@ -406,7 +406,7 @@ def api_get_users(*, page='1'):
     p = Page(num, page_index)
     if num == 0:
         return dict(page=p, users=())
-    users = yield from User.find(orderBy='created_at desc', limit=(p.offset, p.limit))
+    users = yield from User.filter(orderBy='created_at desc', limit=(p.offset, p.limit))
     for u in users:
         u.passwd = '******'
     return dict(page=p, users=users)
@@ -423,7 +423,7 @@ def api_register_user(*, email, name, passwd):
         raise APIValueError('email')
     if not passwd or not _RE_SHA1.match(passwd):
         raise APIValueError('passwd')
-    users = yield from User.find( email= email)
+    users = yield from User.filter( email= email)
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
@@ -451,7 +451,7 @@ def api_register_visitor(*, name, email, site, private=0):
     if not email or not _RE_EMAIL.match(email):
         raise APIValueError('email')
 
-    users = yield from User.find(email=email)
+    users = yield from User.filter(email=email)
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
 
@@ -480,13 +480,13 @@ def api_blogs(request, *, page='1'):
     p = Page(num, page_index)
     if num == 0:
         return dict(page=p, blogs=())
-    blog = yield from Blog.find(orderBy='created_at desc', limit=(p.offset, p.limit))
+    blog = yield from Blog.filter(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, blogs=blog)
 
 
 def get_comments(blog_id):
 
-    comments = yield from Comment.find(blog_id=blog_id)
+    comments = yield from Comment.filter(blog_id=blog_id)
     if comments is None:
         raise APIResourceNotFoundError('Comment')
 
@@ -515,7 +515,7 @@ def api_get_blog(*, id):
         yield from blog.update()
 
     # comments = get_comments(id)
-    comments = yield from Comment.find(blog_id=id)
+    comments = yield from Comment.filter(blog_id=id)
     if comments is None:
         raise APIResourceNotFoundError('Comment')
 
@@ -638,7 +638,7 @@ def api_get_blogs_summary():
 
     if blogs:
         for blog in blogs:
-            comments = yield from Comment.find(blog_id=blog.get("id"))
+            comments = yield from Comment.filter(blog_id=blog.get("id"))
             comments_amount = len(comments)
             blog.setdefault('comments_amount', comments_amount)
     return {
