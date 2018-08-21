@@ -12,7 +12,7 @@ import hashlib
 import asyncio
 from aiohttp import web
 from coroweb import get, post
-from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError
+from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError, APIError
 from models import User, Comment, Blog, Label, next_id
 from config import configs
 
@@ -84,7 +84,6 @@ def cookie2user(cookie_str):
 
 @get('/waterfall')
 def waterfall():
-
     return {
         '__template__': 'waterfall.html',
     }
@@ -147,7 +146,7 @@ def project_list(name):
     blogs = yield from Blog.find(label=name)
     return {
         '__template__': 'blogslist.html',
-        'blogs':blogs
+        'blogs': blogs
     }
 
 
@@ -180,13 +179,11 @@ def getsignin():
     rs_comment = yield from Comment.count()
     doc_info.setdefault('rs_blog', rs_blog[0])
     doc_info.setdefault('rs_comment', rs_comment[0])
-
     return json.dumps(doc_info)
 
 
 @post('/api/authenticate')
 def authenticate(*, email, passwd):
-
     if not email:
         raise APIValueError('email', 'Invalid email.')
     if not passwd:
@@ -409,6 +406,7 @@ def api_get_users(*, page='1'):
     for u in users:
         u.passwd = '******'
     return dict(page=p, users=users)
+
 
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
 _RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
