@@ -69,7 +69,8 @@ def cookie2user(cookie_str):
         uid, expires, sha1 = L
         if int(expires) < time.time():
             return None
-        user = yield from User.find(uid)
+        user = yield from User.find(id=uid)
+        user = user[0]
         if user is None:
             return None
         s = '%s-%s-%s-%s' % (uid, user.passwd, expires, _COOKIE_KEY)
@@ -333,7 +334,8 @@ def api_create_comment(id, request, *, content, parent_id=''):
 
     if not content or not content.strip():
         raise APIValueError('content')
-    blog = yield from Blog.find(id)
+    blog = yield from Blog.find(id=id)
+    blog = blog[0]
     if blog is None:
         raise APIResourceNotFoundError('Blog')
 
@@ -394,6 +396,7 @@ def api_get_comment(id, request):
 def api_delete_comments(id, request):
     check_admin(request)
     c = yield from Comment.find(id)
+    c = c[0]
     if c is None:
         raise APIResourceNotFoundError('Comment')
     yield from c.remove()
@@ -577,7 +580,8 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
         yield from blog.save()
         return json.dumps(blog.id)
     else:
-        blog = yield from Blog.find(pk=blogid)
+        blog = yield from Blog.find(id=blogid)
+        blog = blog[0]
         blog.id = blogid,
         blog.user_id = request.__user__.id,
         blog.user_name = request.__user__.name,
@@ -593,7 +597,8 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
 @get('/api/blogs/{id}/edit')
 def blogs_edit(id, request):
     check_admin(request)
-    blog = yield from Blog.find(pk=id)
+    blog = yield from Blog.find(id=id)
+    blog = blog[0]
     return{
         '__template__': 'modify.html',
         'blog': blog
@@ -620,7 +625,8 @@ def api_update_blog(id, request, *, name, summary, content):
 @post('/api/blogs/{id}/delete')
 def api_delete_blog(id, request):
     check_admin(request)
-    blog = yield from Blog.find(pk=id)
+    blog = yield from Blog.find(id=id)
+    blog = blog[0]
     yield from blog.remove()
     logging.info("博客删除成功！！！")
     data = dict()
