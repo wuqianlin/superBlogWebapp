@@ -117,7 +117,7 @@ def get_blogs_brief(request):
     if max_page > int(max_page):
         max_page = int(max_page) + 1
     if page > max_page:
-        info = 'warning: 页码数应小于最大页码数！'
+        info = 'warning: 页码数应小于等于最大页码数！'
 
     start_step = (page - 1) * size
     sql = "select `id`,`user_id`,`user_name`,`user_image`,`name`,`summary`," \
