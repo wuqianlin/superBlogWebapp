@@ -7,7 +7,6 @@ import mistune
 import re
 import time
 import json
-import logging
 import hashlib
 import asyncio
 from aiohttp import web
@@ -74,12 +73,12 @@ def cookie2user(cookie_str):
             return None
         s = '%s-%s-%s-%s' % (uid, user.passwd, expires, _COOKIE_KEY)
         if sha1 != hashlib.sha1(s.encode('utf-8')).hexdigest():
-            logging.info('invalid sha1')
+            logger.info('invalid sha1')
             return None
         user.passwd = '******'
         return user
     except Exception as e:
-        logging.exception(e)
+        logger.exception(e)
         return None
 
 
@@ -144,7 +143,7 @@ def get_blogs_brief(request):
 
 @get('/project/{name}')
 def project_list(name):
-    blogs = yield from Blog.find(label=name)
+    blogs = yield from Blog.filter(label=name)
     return {
         '__template__': 'blogslist.html',
         'blogs': blogs
@@ -160,7 +159,7 @@ def register():
 
 @get('/signin')
 def signin(request):
-    logging.info(dir(request))
+    logger.info(dir(request))
     return {
         '__template__': 'signin.html'
     }
@@ -233,7 +232,7 @@ def signout(request):
     referer = request.headers.get('Referer')
     r = web.HTTPFound(referer or '/')
     r.set_cookie(COOKIE_NAME, '-deleted-', max_age=0, httponly=True)
-    logging.info('user signed out.')
+    logger.info('user signed out.')
     return r
 
 
@@ -612,7 +611,7 @@ def api_delete_blog(id, request):
     check_admin(request)
     blog = yield from Blog.get(id=id)
     yield from blog.remove()
-    logging.info("博客删除成功！！！")
+    logger.info("博客删除成功！！！")
     data = dict()
     data.setdefault("msc","删除成功")
     data.setdefault("code","2000")
