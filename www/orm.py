@@ -276,6 +276,23 @@ class Model(dict, metaclass=MetaModel):
 
     @classmethod
     @asyncio.coroutine
+    def get(cls, **kw):
+        if len(kw) == 0:
+            rs = yield from select(cls.__select__, None)
+        else:
+            args = []
+            values = []
+            for k, v in kw.items():
+                args.append('%s=?' % k)
+                values.append(v)
+            rs = yield from select('%s where %s ' % (cls.__select__, ' and '.join(args)), values)
+        if len(rs) == 0:
+            return None
+        else:
+            return cls(**rs[0])
+
+    @classmethod
+    @asyncio.coroutine
     def count(cls):
         sql = 'select count(*) as __num__ from `%s`' % cls.__table__
         args = []
