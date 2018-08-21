@@ -10,7 +10,10 @@ from utils import logger
 
 # 记录SQL语句执行日志
 def log(sql, args=()):
-    sql_str = sql.replace('?', '%s') % (args or ())
+    try:
+        sql_str = sql.replace('?', '%s') % (args or ())
+    except:
+        sql_str = sql
     logger.info('SQL:  %s' % sql_str)
 
 
