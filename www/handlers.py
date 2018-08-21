@@ -9,7 +9,6 @@ import time
 import json
 import logging
 import hashlib
-import base64
 import asyncio
 from aiohttp import web
 from coroweb import get, post
@@ -40,9 +39,9 @@ def get_page_index(page_str):
 
 
 def user2cookie(user, max_age):
-    '''
+    """
     Generate cookie str by user.
-    '''
+    """
     # build cookie string by: id-expires-sha1
     expires = str(int(time.time() + max_age))
     s = '%s-%s-%s-%s' % (user['id'], user['passwd'], expires, _COOKIE_KEY)
@@ -57,9 +56,9 @@ def text2html(text):
 
 @asyncio.coroutine
 def cookie2user(cookie_str):
-    '''
+    """
     Parse cookie and load user if cookie is valid.
-    '''
+    """
     if not cookie_str:
         return None
     try:
@@ -202,8 +201,8 @@ def authenticate(*, email, passwd):
     sha1.update(user['id'].encode('utf-8'))
     sha1.update(b':')
     sha1.update(passwd.encode('utf-8'))
-    print( 'user[\'passwd\']:', user['passwd']  )
-    print( 'sha1.hexdigest():', sha1.hexdigest() )
+    print('user[\'passwd\']:', user['passwd'])
+    print('sha1.hexdigest():', sha1.hexdigest())
 
     if user['passwd'] != sha1.hexdigest():
         raise APIValueError('passwd', 'Invalid password.')
@@ -263,14 +262,14 @@ def manage_blogs(request):
     }
 
 
-'''
+"""
 @get('/manage/blogs')
 def manage_blogs(*, page='1'):
     return {
         '__template__': 'manage_blogs.html',
         'page_index': get_page_index(page)
     }
-'''
+"""
 
 
 @get('/manage/editor')
@@ -428,7 +427,7 @@ def api_register_user(*, email, name, passwd):
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
     sha1_passwd = '%s:%s' % (uid, passwd)
-    print( sha1_passwd )
+    print(sha1_passwd)
     user = User(id=uid,
                 name=name.strip(),
                 email=email,
