@@ -3,22 +3,14 @@
 
 import time
 import uuid
-import logging
 import asyncio
 import aiomysql
-
-logging.basicConfig(level=logging.INFO)
+from utils import logger
 
 
 # 记录SQL语句执行日志
 def log(sql):
-    logging.info('SQL:  %s' % sql)
-
-
-"""
-    aiomysql为MySQL数据库提供了异步IO的驱动。
-    由于Web框架使用了基于asyncio的aiohttp，这是基于协程的异步模型。
-"""
+    logger.info('SQL:  %s' % sql)
 
 
 @asyncio.coroutine
@@ -29,7 +21,7 @@ def create_pool(_loop, **kw):
     连接池由全局变量__pool存储，缺省情况下将编码设置为utf8，自动提交事务：
     要执行SELECT语句，我们用select函数执行，需要传入SQL语句和SQL参数：
     """
-    logging.info('create database connection pool...')
+    logger.info('create database connection pool...')
     global __pool
     __pool = yield from aiomysql.create_pool(
         host=kw.get('host', 'localhost'),
@@ -66,7 +58,7 @@ def select(sql, args=(), size=None):
             rs = yield from cur.fetchall()
         yield from cur.close()
 
-        logging.info('rows returned: %s' % len(rs))
+        logger.info('rows returned: %s' % len(rs))
         return rs
 
 
@@ -160,7 +152,7 @@ class MetaModel(type):
 
         # 获取table名称
         table_name = attrs.get('__table__', None) or name
-        logging.info('found model: %s (table: %s)' % (name, table_name))
+        logger.info('found model: %s (table: %s)' % (name, table_name))
 
         # 获取所有的Field和主键名
         mappings = dict()
@@ -168,7 +160,7 @@ class MetaModel(type):
         primary_key = None
         for key, value in attrs.items():
             if isinstance(value, Field):
-                logging.info('  found mapping: %s ==> %s' % (key, value))
+                logger.info('found mapping: %s ==> %s' % (key, value))
                 mappings[key] = value
                 if value.primary_key:
                     # 找到主键:
@@ -230,7 +222,7 @@ class Model(dict, metaclass=MetaModel):
             field = self.__mappings__[key]
             if field.default is not None:
                 value = field.default() if callable(field.default) else field.default
-                logging.debug('using default value for %s: %s' % (key, str(value)))
+                logger.debug('using default value for %s: %s' % (key, str(value)))
                 setattr(self, key, value)
         return value
 
@@ -313,7 +305,7 @@ class Model(dict, metaclass=MetaModel):
         args.append(self.get_value_or_default(self.__primary_key__))
         rows = yield from execute(self.__insert__, args)
         if rows != 1:
-            logging.warn('failed to insert record: affected rows: %s' % rows)
+            logger.warn('failed to insert record: affected rows: %s' % rows)
 
     @asyncio.coroutine
     def update(self):
@@ -321,21 +313,21 @@ class Model(dict, metaclass=MetaModel):
         args.append(self.get_value(self.__primary_key__))
         rows = yield from execute(self.__update__, args)
         if rows != 1:
-            logging.warning('failed to update record: affected rows: %s' % rows)
+            logger.warning('failed to update record: affected rows: %s' % rows)
 
     @asyncio.coroutine
     def delete(self):
         args = [self.get_value(self.__primary_key__)]
         rows = yield from execute(self.__delete__, args)
         if rows != 1:
-            logging.warning('failed to delete by primary key: affected rows: %s' % rows)
+            logger.warning('failed to delete by primary key: affected rows: %s' % rows)
 
     @asyncio.coroutine
     def remove(self):
         args = [self.get_value(self.__primary_key__)]
         rows = yield from execute(self.__delete__, args)
         if rows != 1:
-            logging.warning('failed to remove by primary key: affected rows: %s' % rows)
+            logger.warning('failed to remove by primary key: affected rows: %s' % rows)
 
 
 def next_id():
@@ -370,7 +362,6 @@ class Blog(Model):
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-
     @asyncio.coroutine
     def test_example():
         kw = {'user': 'dukeBlogWeb',
@@ -385,16 +376,12 @@ if __name__ == "__main__":
               "`created_at`,`latestupdated_at` from blogs ORDER BY `created_at` DESC limit %i, %i;"
 
         blogs = yield from Blog.execute(sql % (2, 12))
-
         if blogs:
             for blog in blogs:
                 print(blog)
-
         a = yield from Blog.count()
         print(a)
-
         __pool.close()
         yield from __pool.wait_closed()
-
     loop.run_until_complete(test_example())
 
