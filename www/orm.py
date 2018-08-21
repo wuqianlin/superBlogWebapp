@@ -9,8 +9,9 @@ from utils import logger
 
 
 # 记录SQL语句执行日志
-def log(sql):
-    logger.info('SQL:  %s' % sql)
+def log(sql, args=()):
+    sql_str = sql.replace('?', '%s') % (args or ())
+    logger.info('SQL:  %s' % sql_str)
 
 
 @asyncio.coroutine
@@ -47,7 +48,7 @@ def destroy_pool():
 
 @asyncio.coroutine
 def select(sql, args=(), size=None):
-    log(sql)
+    log(sql, args)
     global __pool
     with (yield from __pool) as conn:
         cur = yield from conn.cursor(aiomysql.DictCursor)
@@ -69,7 +70,7 @@ def execute(sql, args=()):
     以及返回一个整数表示影响的行数：
     execute()函数和select()函数所不同的是，cursor对象不返回结果集，而是通过rowcount返回结果数。
     """
-    log(sql)
+    log(sql, args)
     with (yield from __pool) as conn:
         try:
             cur = yield from conn.cursor()
