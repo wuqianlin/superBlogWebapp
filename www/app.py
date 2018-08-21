@@ -8,7 +8,6 @@ __author__ = 'duke.wu'
 async web application.
 """
 
-import logging;
 import asyncio
 import os
 import json
@@ -16,18 +15,15 @@ import time
 from datetime import datetime
 from aiohttp import web
 from jinja2 import Environment, FileSystemLoader
-from jinja2.ext import autoescape
 import orm
 from config import configs
 from coroweb import add_routes, add_static
 from handlers import cookie2user, COOKIE_NAME
-
-
-logging.basicConfig(level=logging.INFO)
+from utils import logger
 
 
 def init_jinja2(app, **kw):
-    logging.info('init jinja2...')
+    logger.info('init jinja2...')
     options = dict(
         autoescape = kw.get('autoescape', True),
         block_start_string = kw.get('block_start_string', '{%'),
@@ -39,7 +35,7 @@ def init_jinja2(app, **kw):
     path = kw.get('path', None)
     if path is None:
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-    logging.info('set jinja2 template path: %s' % path)
+    logger.info('set jinja2 template path: %s' % path)
     env = Environment(loader=FileSystemLoader(path), **options)
     filters = kw.get('filters', None)
     if filters is not None:
@@ -51,27 +47,24 @@ def init_jinja2(app, **kw):
 @asyncio.coroutine
 def logger_factory(app, handler):
     @asyncio.coroutine
-    def logger(request):
-        logging.info('Request: %s %s' % (request.method, request.path))
+    def loggers(request):
+        logger.info('Request: %s %s' % (request.method, request.path))
         return (yield from handler(request))
-    return logger
+    return loggers
 
 
 @asyncio.coroutine
 def auth_factory(app, handler):
     @asyncio.coroutine
     def auth(request):
-        logging.info('check user: %s %s' % (request.method, request.path))
+        logger.info('check user: %s %s' % (request.method, request.path))
         request.__user__ = None
-
-        print( dir(handler) )
-
         cookie_str = request.cookies.get(COOKIE_NAME)
-        logging.info('cookie_str : %s' % cookie_str)
+        logger.info('cookie_str : %s' % cookie_str)
         if cookie_str:
             user = yield from cookie2user(cookie_str)
             if user:
-                logging.info('set current user: %s' % user.email)
+                logger.info('set current user: %s' % user.email)
                 request.__user__ = user
         if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
             return web.HTTPFound('/signin')
@@ -86,10 +79,10 @@ def data_factory(app, handler):
         if request.method == 'POST':
             if request.content_type.startswith('application/json'):
                 request.__data__ = yield from request.json()
-                logging.info('request json: %s' % str(request.__data__))
+                logger.info('request json: %s' % str(request.__data__))
             elif request.content_type.startswith('application/x-www-form-urlencoded'):
                 request.__data__ = yield from request.post()
-                logging.info('request form: %s' % str(request.__data__))
+                logger.info('request form: %s' % str(request.__data__))
         return (yield from handler(request))
     return parse_data
 
@@ -98,7 +91,7 @@ def data_factory(app, handler):
 def response_factory(app, handler):
     @asyncio.coroutine
     def response(request):
-        logging.info('Response handler...')
+        logger.info('Response handler...')
         r = yield from handler(request)
         if isinstance(r, web.StreamResponse):
             return r
@@ -184,7 +177,7 @@ def init(loop):
     add_routes(app, 'handlers')
     add_static(app)
     srv = yield from loop.create_server(app.make_handler(), '127.0.0.1', 9000)
-    logging.info('server started at http://127.0.0.1:9000...')
+    logger.info('server started at http://127.0.0.1:9000...')
     return srv
 
 

@@ -4,12 +4,12 @@ __author__ = 'duke.wu'
 
 import os
 import inspect
-import logging
 import functools
 import asyncio
 from urllib import parse
 from aiohttp import web
 from apis import APIError
+from utils import logger
 
 
 def get(path):
@@ -119,7 +119,6 @@ class RequestHandler(object):
                     kw = dict()
                     for k, v in parse.parse_qs(qs, True).items():
                         kw[k] = v[0]
-        print("函数参数检查:%s" % kw)
         if kw is None:
             kw = dict(**request.match_info)
         else:
@@ -133,7 +132,7 @@ class RequestHandler(object):
             # check named arg:
             for k, v in request.match_info.items():
                 if k in kw:
-                    logging.warning('Duplicate arg name in named arg and kw args: %s' % k)
+                    logger.warning('Duplicate arg name in named arg and kw args: %s' % k)
                 kw[k] = v
         if self._has_request_arg:
             kw['request'] = request
@@ -142,7 +141,7 @@ class RequestHandler(object):
             for name in self._required_kw_args:
                 if not name in kw:
                     return web.HTTPBadRequest('Missing argument: %s' % name)
-        logging.info('call with args: %s' % str(kw))
+        logger.info('call with args: %s' % str(kw))
         try:
             r = yield from self._func(**kw)
             return r
@@ -153,7 +152,7 @@ class RequestHandler(object):
 def add_static(app):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
     app.router.add_static('/static/', path)
-    logging.info('add static %s => %s' % ('/static/', path))
+    logger.info('add static %s => %s' % ('/static/', path))
 
 
 def add_route(app, fn):
@@ -163,7 +162,7 @@ def add_route(app, fn):
         raise ValueError('@get or @post not defined in %s.' % str(fn))
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
         fn = asyncio.coroutine(fn)
-    logging.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
+    logger.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
     app.router.add_route(method, path, RequestHandler(app, fn))
 
 

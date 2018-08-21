@@ -57,8 +57,6 @@ def select(sql, args=(), size=None):
         else:
             rs = yield from cur.fetchall()
         yield from cur.close()
-
-        logger.info('rows returned: %s' % len(rs))
         return rs
 
 

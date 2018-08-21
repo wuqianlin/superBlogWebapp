@@ -15,6 +15,7 @@ from coroweb import get, post
 from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError, APIError
 from models import User, Comment, Blog, Label, next_id
 from config import configs
+from utils import logger
 
 
 COOKIE_NAME = 'awesession'
@@ -198,8 +199,8 @@ def authenticate(*, email, passwd):
     sha1.update(user['id'].encode('utf-8'))
     sha1.update(b':')
     sha1.update(passwd.encode('utf-8'))
-    print('user[\'passwd\']:', user['passwd'])
-    print('sha1.hexdigest():', sha1.hexdigest())
+    logger.info('user[\'passwd\']:', user['passwd'])
+    logger.info('sha1.hexdigest():', sha1.hexdigest())
 
     if user['passwd'] != sha1.hexdigest():
         raise APIValueError('passwd', 'Invalid password.')
@@ -315,7 +316,7 @@ def api_comments(*, page='1'):
 
 @post('/md')
 def editor_md(submit):
-    print(submit)
+    logger.info(submit)
 
 
 @post('/api/blogs/{id}/comments')
@@ -425,7 +426,7 @@ def api_register_user(*, email, name, passwd):
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
     sha1_passwd = '%s:%s' % (uid, passwd)
-    print(sha1_passwd)
+    logger.info(sha1_passwd)
     user = User(id=uid,
                 name=name.strip(),
                 email=email,
