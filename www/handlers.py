@@ -69,8 +69,7 @@ def cookie2user(cookie_str):
         uid, expires, sha1 = L
         if int(expires) < time.time():
             return None
-        user = yield from User.find(id=uid)
-        user = user[0]
+        user = yield from User.get(id=uid)
         if user is None:
             return None
         s = '%s-%s-%s-%s' % (uid, user.passwd, expires, _COOKIE_KEY)
@@ -193,7 +192,6 @@ def authenticate(*, email, passwd):
         raise APIValueError('email', 'Invalid email.')
     if not passwd:
         raise APIValueError('passwd', 'Invalid password.')
-    # users = yield from User.find('email=?', [email])
     users = yield from User.find(email=email)
     if len(users) == 0:
         raise APIValueError('email', 'Email not exist.')
@@ -334,8 +332,7 @@ def api_create_comment(id, request, *, content, parent_id=''):
 
     if not content or not content.strip():
         raise APIValueError('content')
-    blog = yield from Blog.find(id=id)
-    blog = blog[0]
+    blog = yield from Blog.get(id=id)
     if blog is None:
         raise APIResourceNotFoundError('Blog')
 
@@ -395,8 +392,7 @@ def api_get_comment(id, request):
 @post('/api/comments/{id}/delete')
 def api_delete_comments(id, request):
     check_admin(request)
-    c = yield from Comment.find(id)
-    c = c[0]
+    c = yield from Comment.get(id=id)
     if c is None:
         raise APIResourceNotFoundError('Comment')
     yield from c.remove()
@@ -427,7 +423,6 @@ def api_register_user(*, email, name, passwd):
         raise APIValueError('email')
     if not passwd or not _RE_SHA1.match(passwd):
         raise APIValueError('passwd')
-    # users = yield from User.find('email=?', [email])
     users = yield from User.find( email= email)
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
@@ -456,7 +451,7 @@ def api_register_visitor(*, name, email, site, private=0):
     if not email or not _RE_EMAIL.match(email):
         raise APIValueError('email')
 
-    users = yield from User.find( email= email)
+    users = yield from User.find(email=email)
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
 
@@ -514,13 +509,7 @@ def get_comments(blog_id):
 
 @get('/api/blogs/{id}')
 def api_get_blog(*, id):
-    blog = yield from Blog.find(id=id)
-    # comments = yield from Comment.find(blog_id=id)
-    # comments = yield from Comment.find()
-    # for c in comments:
-    #    c['html_content'] = text2html(c['content'])
-
-    blog = blog[0]
+    blog = yield from Blog.get(id=id)
     if blog:
         blog.read_total += 1
         yield from blog.update()
@@ -580,8 +569,7 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
         yield from blog.save()
         return json.dumps(blog.id)
     else:
-        blog = yield from Blog.find(id=blogid)
-        blog = blog[0]
+        blog = yield from Blog.get(id=blogid)
         blog.id = blogid,
         blog.user_id = request.__user__.id,
         blog.user_name = request.__user__.name,
@@ -597,8 +585,7 @@ def api_create_blog(request, *, name, content, label, limit, blogid=''):
 @get('/api/blogs/{id}/edit')
 def blogs_edit(id, request):
     check_admin(request)
-    blog = yield from Blog.find(id=id)
-    blog = blog[0]
+    blog = yield from Blog.get(id=id)
     return{
         '__template__': 'modify.html',
         'blog': blog
@@ -608,7 +595,7 @@ def blogs_edit(id, request):
 @post('/api/blogs/{id}')
 def api_update_blog(id, request, *, name, summary, content):
     check_admin(request)
-    blog = yield from Blog.find(id)
+    blog = yield from Blog.get(id=id)
     if not name or not name.strip():
         raise APIValueError('name', 'name cannot be empty.')
     if not summary or not summary.strip():
@@ -625,8 +612,7 @@ def api_update_blog(id, request, *, name, summary, content):
 @post('/api/blogs/{id}/delete')
 def api_delete_blog(id, request):
     check_admin(request)
-    blog = yield from Blog.find(id=id)
-    blog = blog[0]
+    blog = yield from Blog.get(id=id)
     yield from blog.remove()
     logging.info("博客删除成功！！！")
     data = dict()
